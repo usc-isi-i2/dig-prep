@@ -1,5 +1,5 @@
 """
-dig.indexreferenceurls
+dig.indexdigdata
 """
 __author__ = 'saggu'
 
@@ -9,7 +9,7 @@ from sys import stderr
 
 es = Elasticsearch([{'host': 'localhost', 'port': 9200}])
 
-fileName = "build.json"
+fileName = "bp-merged-elastic_ps.json"
 
 
 def indexURL():
@@ -23,8 +23,9 @@ def indexURL():
                 objkey = jsonurlobj.keys()[0]
                 body = jsonurlobj[objkey]
                 #print body
+		#print objkey
                 print "indexing id: " + objkey + "\n"
-                es.index(index="urls",doc_type="url",id=objkey,body=body)
+                es.index(index="snapshots",doc_type="snapshot",id=objkey,body=body)
     except Exception, e:
         print >> stderr.write('ERROR: %s\n' % str(e))
 
