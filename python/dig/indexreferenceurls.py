@@ -1,8 +1,6 @@
-
 """
-dig.indexreferenceurls
+indexreferenceurls
 """
-
 __author__ = 'saggu'
 
 import json
@@ -23,8 +21,10 @@ def indexURL():
             if line.strip() != "":
                 jsonurlobj = json.loads(line.strip())
                 objkey = jsonurlobj.keys()[0]
+                body = jsonurlobj[objkey]
+                #print body
                 print "indexing id: " + objkey + "\n"
-                es.index(index="urls",doc_type="url",id=objkey,body=line)
+                es.index(index="urls",doc_type="url",id=objkey,body=body)
     except Exception, e:
         print >> stderr.write('ERROR: %s\n' % str(e))
 
