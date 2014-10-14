@@ -113,9 +113,8 @@ public class DereferenceURIServlet {
 			searchResp = item.getResponse();
 			searchHit = searchResp.getHits().getHits();
 			
-			JSONObject pObj = new JSONObject();
 			JSONObject obj = new JSONObject();
-			JSONArray ja = new JSONArray();
+			//JSONArray ja = new JSONArray();
 			
 			for(SearchHit sr : searchHit){
 					map = sr.getFields();
@@ -128,11 +127,12 @@ public class DereferenceURIServlet {
 					obj.accumulate(map.get(SearchFieldsES.CONTENT_SHA1).getName(), map.get(SearchFieldsES.CONTENT_SHA1).getValue());
 					obj.accumulate(map.get(SearchFieldsES.EPOCH).getName(), map.get(SearchFieldsES.EPOCH).getValue());
 					
-					ja.add(obj);
+					//ja.add(obj);
 			}
 			
-			pObj.accumulate("results", ja);
-			return pObj.toString();
+			//pObj.accumulate("results", ja);
+			//assuming there is only one hit per <sha1-epoch> as it should be
+			return obj.toString();
 			
 			
 			//return sha + "-" + epoch;
