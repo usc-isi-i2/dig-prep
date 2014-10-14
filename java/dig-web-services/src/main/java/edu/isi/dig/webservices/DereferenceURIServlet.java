@@ -5,26 +5,19 @@ import java.util.Map;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.QueryParam;
-
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 import org.elasticsearch.action.search.MultiSearchResponse;
-import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
-import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.node.Node;
-import org.elasticsearch.node.NodeBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHitField;
-import org.elasticsearch.search.SearchHits;
-
 import edu.isi.dig.db.DBManager;
 
 @Path("/isi")
@@ -108,8 +101,38 @@ public class DereferenceURIServlet {
 				
 			}
 			
-			int i = multiResp.getResponses().length;
-			return String.valueOf(i);
+			//int i = multiResp.getResponses().length;
+			
+			SearchHit[] searchHit;
+			
+			Map<String,SearchHitField> map ;
+			
+			MultiSearchResponse.Item item = multiResp.getResponses()[0]; //Can't figure out why would it have more Items than one 
+																		//after looking into elastic Search Code
+			
+			searchResp = item.getResponse();
+			searchHit = searchResp.getHits().getHits();
+			
+			JSONObject pObj = new JSONObject();
+			JSONObject obj = new JSONObject();
+			JSONArray ja = new JSONArray();
+			
+			for(SearchHit sr : searchHit){
+					map = sr.getFields();
+					obj.accumulate(map.get(SearchFieldsES.NATIVE_URL).getName(), map.get(SearchFieldsES.NATIVE_URL).getValue());
+					obj.accumulate(map.get(SearchFieldsES.CONTENT_URL).getName(), map.get(SearchFieldsES.CONTENT_URL).getValue());
+					obj.accumulate(map.get(SearchFieldsES.CACHE_URL).getName(), map.get(SearchFieldsES.CACHE_URL).getValue());
+					obj.accumulate(map.get(SearchFieldsES.MEMEX_URL).getName(), map.get(SearchFieldsES.MEMEX_URL).getValue());
+					obj.accumulate(map.get(SearchFieldsES.SHA1).getName(), map.get(SearchFieldsES.SHA1).getValue());
+					obj.accumulate(map.get(SearchFieldsES.SOURCE).getName(), map.get(SearchFieldsES.SOURCE).getValue());
+					obj.accumulate(map.get(SearchFieldsES.CONTENT_SHA1).getName(), map.get(SearchFieldsES.CONTENT_SHA1).getValue());
+					obj.accumulate(map.get(SearchFieldsES.EPOCH).getName(), map.get(SearchFieldsES.EPOCH).getValue());
+					
+					ja.add(obj);
+			}
+			
+			pObj.accumulate("results", ja);
+			return pObj.toString();
 			
 			
 			//return sha + "-" + epoch;
@@ -128,5 +151,5 @@ public class DereferenceURIServlet {
 		}
 				
 	}
-
+	
 }
