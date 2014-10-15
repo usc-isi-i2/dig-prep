@@ -5,7 +5,7 @@
   <groupId>dig-web-services</groupId>
   <artifactId>dig</artifactId>
   <version>0.0.1-SNAPSHOT</version>
-  <packaging>jar</packaging>
+  <packaging>war</packaging>
 
   <name>dig-web-services</name>
   <url>http://maven.apache.org</url>
