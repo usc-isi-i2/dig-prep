@@ -36,7 +36,7 @@ public class DereferenceURIServlet {
 	final String CLUSTER_NAME = "cluster.name";
 	final String CLUSTER_NAME_VALUE = "dig_isi";
 	final String ELASTICSEARCH_HOST = "karma-dig-service.cloudapp.net"; 
-	final int ELASTICSEARCH_PORT = 55309;
+	final int ELASTICSEARCH_PORT = 55309; //or 55315 for dig 5
 	
 	Client esClient=null;
 	TransportClient ts =null;
@@ -140,7 +140,7 @@ public class DereferenceURIServlet {
 			JSONObject parentObj= new JSONObject();
 			JSONArray jArray = new JSONArray();
 
-			if(searchHit.length > 1) {
+			if(searchHit.length > 0) {
 				for(SearchHit sr : searchHit){
 						map = sr.getFields();
 						JSONObject obj = new JSONObject();
@@ -217,7 +217,7 @@ public class DereferenceURIServlet {
 			JSONArray jArray = new JSONArray();
 			JSONObject obj = new JSONObject();
 			
-			if(searchHit.length > 1){
+			if(searchHit.length > 0){
 			
 				SearchHit searchHitLatest = searchHit[0]; //we need the latest, get the first one, sorted by epoch in descending order
 				Map<String,SearchHitField> map = searchHitLatest.getFields();
@@ -291,7 +291,7 @@ public String GetImagesAllEpochs(String sha, String indexName, String indexType)
 			JSONObject parentObj= new JSONObject();
 			JSONArray jArray = new JSONArray();
 
-			if(searchHit.length > 1) {
+			if(searchHit.length > 0) {
 				for(SearchHit sr : searchHit){
 						map = sr.getFields();
 						JSONObject obj = new JSONObject();
@@ -369,7 +369,7 @@ public String GetPagesURLs(String sha, String epoch,String indexName, String ind
 		JSONObject parentObj= new JSONObject();
 		JSONArray jArray = new JSONArray();
 
-		if(searchHit.length > 1) {
+		if(searchHit.length > 0) {
 			for(SearchHit sr : searchHit){
 					map = sr.getFields();
 					JSONObject obj = new JSONObject();
@@ -442,7 +442,7 @@ try{
 		JSONArray jArray = new JSONArray();
 		JSONObject obj = new JSONObject();
 		
-		if(searchHit.length > 1){
+		if(searchHit.length > 0){
 		
 			SearchHit searchHitLatest = searchHit[0]; //we need the latest, get the first one, sorted by epoch in descending order
 			Map<String,SearchHitField> map = searchHitLatest.getFields();
@@ -512,7 +512,7 @@ public String GetPagesAllEpochs(String sha, String indexName, String indexType){
 		JSONObject parentObj= new JSONObject();
 		JSONArray jArray = new JSONArray();
 
-		if(searchHit.length > 1) {
+		if(searchHit.length > 0) {
 			for(SearchHit sr : searchHit){
 					map = sr.getFields();
 					JSONObject obj = new JSONObject();
