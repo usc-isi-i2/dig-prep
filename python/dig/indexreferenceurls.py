@@ -15,14 +15,16 @@ es = Elasticsearch([{'host': 'localhost', 'port': 9200}])
 
 
 def readJsonfromFile(fileName):
-    with open(fileName) as f:
-        d = json.load(f)
-        for fc in d:
-            sha1 = re.findall('([a-f0-9]{40})',fc["uri"]) #find all sha from the uri
-            urisha = sha1[0] #there should be only one sha1 hex in the url
-            print "indexing id: " + urisha
-            es.index(index="istrads",doc_type="istrad",id=urisha,body=fc)
-
+    try:
+        with open(fileName) as f:
+            d = json.load(f)
+            for fc in d:
+                sha1 = re.findall('([a-f0-9]{40})',fc["uri"]) #find all sha from the uri
+                urisha = sha1[0] #there should be only one sha1 hex in the url
+                print "indexing id: " + urisha
+                es.index(index="istrads",doc_type="istrad",id=urisha,body=fc)
+    except Exception, e:
+        print >> stderr.write('ERROR: %s\n' % str(e))
 
 def indexURL(fileName):
     try:
