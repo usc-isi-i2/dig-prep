@@ -9,7 +9,6 @@ import javax.ws.rs.PathParam;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
-import org.elasticsearch.action.search.MultiSearchRequestBuilder;
 import org.elasticsearch.action.search.MultiSearchResponse;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
@@ -41,7 +40,7 @@ public class DereferenceURIServlet {
 	Client esClient=null;
 	TransportClient ts =null;
 	MultiSearchResponse multiResp = null;
-	MultiSearchRequestBuilder msrb = null;
+	
 			
 	Settings settings = null;
 	
@@ -112,8 +111,8 @@ public class DereferenceURIServlet {
 				  .addField(SearchFieldsES.SOURCE);
 			SearchRequestBuilder srbEpoch = esClient.prepareSearch()
 					.setQuery(QueryBuilders.matchQuery(SearchFieldsES.EPOCH, epoch))
-					.setIndices(INDEX_IMAGES)
-			  		.setTypes(INDEX_IMAGES)
+					.setIndices(indexName)
+			  		.setTypes(indexType)
 			  		.addField(SearchFieldsES.NATIVE_URL)
 			  		.addField(SearchFieldsES.CACHE_URL)
 			  		.addField(SearchFieldsES.CONTENT_URL)
@@ -343,8 +342,8 @@ public String GetPagesURLs(String sha, String epoch,String indexName, String ind
 			  .addField(SearchFieldsES.SOURCE);
 		SearchRequestBuilder srbEpoch = esClient.prepareSearch()
 				.setQuery(QueryBuilders.matchQuery(SearchFieldsES.EPOCH, epoch))
-				.setIndices(INDEX_IMAGES)
-		  		.setTypes(INDEX_IMAGES)
+				.setIndices(indexName)
+		  		.setTypes(indexType)
 		  		.addField(SearchFieldsES.NATIVE_URL)
 		  		.addField(SearchFieldsES.CACHE_URL)
 		  		.addField(SearchFieldsES.MEMEX_URL)
