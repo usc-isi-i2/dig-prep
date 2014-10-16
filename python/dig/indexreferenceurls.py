@@ -20,7 +20,7 @@ def readJsonfromFile(fileName):
             d = json.load(f)
             for fc in d:
                 sha1 = re.findall('([a-f0-9]{40})',fc["uri"]) #find all sha from the uri
-                urisha = sha1[0] #there should be only one sha1 hex in the url
+                urisha = sha1[0].upper() #there should be only one sha1 hex in the url
                 print "indexing id: " + urisha
                 es.index(index="istrads",doc_type="istrad",id=urisha,body=fc)
     except Exception, e:
