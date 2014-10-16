@@ -26,7 +26,7 @@ def indexURL(fileName):
                 body = jsonurlobj[objkey]
                 #print body
                 print "indexing id: " + objkey + "\n"
-                es.index(index="images",doc_type="image",id=objkey,body=body)
+                es.index(index="pages",doc_type="page",id=objkey,body=body)
     except Exception, e:
         print >> stderr.write('ERROR: %s\n' % str(e))
 
