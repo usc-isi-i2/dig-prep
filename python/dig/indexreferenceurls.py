@@ -14,7 +14,7 @@ es = Elasticsearch([{'host': 'localhost', 'port': 9200}])
 #fileName = "build.json"
 
 
-def readJsonfromFile(fileName):
+def readJsonfromFile(fileName,index,docType):
     try:
         with open(fileName) as f:
             d = json.load(f)
@@ -22,11 +22,11 @@ def readJsonfromFile(fileName):
                 sha1 = re.findall('([a-f0-9]{40})',fc["uri"]) #find all sha from the uri
                 urisha = sha1[0].upper() #there should be only one sha1 hex in the url
                 print "indexing id: " + urisha
-                es.index(index="istrads",doc_type="istrad",id=urisha,body=fc)
+                es.index(index=index,doc_type=docType,id=urisha,body=fc)
     except Exception, e:
         print >> stderr.write('ERROR: %s\n' % str(e))
 
-def indexURL(fileName):
+def indexURL(fileName,index,docType):
     try:
 
         with open(fileName) as f:
@@ -39,18 +39,20 @@ def indexURL(fileName):
                 body = jsonurlobj[objkey]
                 #print body
                 print "indexing id: " + objkey + "\n"
-                es.index(index="pages",doc_type="page",id=objkey,body=body)
+                es.index(index=index,doc_type=docType,id=objkey,body=body)
     except Exception, e:
         print >> stderr.write('ERROR: %s\n' % str(e))
 
 if __name__ == '__main__':
 
-    if len(sys.argv) > 1:
-   #     indexURL(sys.argv[1])
-        readJsonfromFile(sys.argv[1])
-        #indexURL(f)
+    if len(sys.argv) == 5:
+        if sys.argv[4] == 0: #separate id included in json for indexing, Andrew's format
+          indexURL(sys.argv[1],sys.argv[2],sys.argv[3])
+        elif sys.argv[4] == 1: #separate id read from URI in json for indexing, Pedro's format
+          readJsonfromFile(sys.argv[1],sys.argv[2],sys.argv[3])
+
     else:
-        print "Input file name"
+        print "Usage: indexreferenceurls.py <fileName> <index> <doctype> ,<fileType>"
 
 
     print "Done!"
