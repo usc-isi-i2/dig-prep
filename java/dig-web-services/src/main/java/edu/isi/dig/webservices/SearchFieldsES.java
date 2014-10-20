@@ -10,5 +10,7 @@ public class SearchFieldsES {
 	public static final String CONTENT_SHA1 = "content_sha1";
 	public static final String EPOCH = "epoch";
 	public static final String SOURCE = "source";
+	public static final String DOCUMENT_TYPE = "document_type";
+	public static final String PROCESS_STAGE = "process_stage";
 
 }

@@ -67,14 +67,14 @@ public class DereferenceURIServlet {
 	}
 	
 	@GET
-	@Path("/pages/{sha}/{epoch}/processed")
+	@Path("/pages/{sha}/{epoch}/raw")
 	public String GetElasticSearchPages(@PathParam("sha") String sha, @PathParam("epoch") String epoch){
 		
 				return GetPagesURLs(sha, epoch, INDEX_PAGES, INDEX_TYPE_PAGE);
 	}
 	
 	@GET
-	@Path("/pages/{sha}/latest/processed")
+	@Path("/pages/{sha}/latest/raw")
 	public String GetElasticSearchPagesBySha(@PathParam("sha") String sha){
 			
 			return GetPageURLsBySha(sha, INDEX_PAGES, INDEX_TYPE_PAGE);
@@ -82,7 +82,7 @@ public class DereferenceURIServlet {
 	
 	
 	@GET
-	@Path("/pages/{sha}/processed")
+	@Path("/pages/{sha}/raw")
 	public String GetElasticSearchAllEpochs(@PathParam("sha") String sha){
 		
 		return GetPagesAllEpochs(sha, INDEX_PAGES, INDEX_TYPE_PAGE);
@@ -339,7 +339,10 @@ public String GetPagesURLs(String sha, String epoch,String indexName, String ind
 			  .addField(SearchFieldsES.MEMEX_URL)
 			  .addField(SearchFieldsES.EPOCH)
 			  .addField(SearchFieldsES.SHA1)
-			  .addField(SearchFieldsES.SOURCE);
+			  .addField(SearchFieldsES.SOURCE)
+			  .addField(SearchFieldsES.DOCUMENT_TYPE)
+			  .addField(SearchFieldsES.PROCESS_STAGE);
+			
 		SearchRequestBuilder srbEpoch = esClient.prepareSearch()
 				.setQuery(QueryBuilders.matchQuery(SearchFieldsES.EPOCH, epoch))
 				.setIndices(indexName)
@@ -349,7 +352,9 @@ public String GetPagesURLs(String sha, String epoch,String indexName, String ind
 		  		.addField(SearchFieldsES.MEMEX_URL)
 		  		.addField(SearchFieldsES.EPOCH)
 		  		.addField(SearchFieldsES.SHA1)
-		  		.addField(SearchFieldsES.SOURCE);
+		  		.addField(SearchFieldsES.SOURCE)
+		  		.addField(SearchFieldsES.DOCUMENT_TYPE)
+		  		.addField(SearchFieldsES.PROCESS_STAGE);
 		
 		
 		multiResp = esClient.prepareMultiSearch()
@@ -379,6 +384,8 @@ public String GetPagesURLs(String sha, String epoch,String indexName, String ind
 					obj.accumulate(map.get(SearchFieldsES.SHA1).getName(), map.get(SearchFieldsES.SHA1).getValue());
 					obj.accumulate(map.get(SearchFieldsES.SOURCE).getName(), map.get(SearchFieldsES.SOURCE).getValue());
 					obj.accumulate(map.get(SearchFieldsES.EPOCH).getName(), map.get(SearchFieldsES.EPOCH).getValue());
+					obj.accumulate(map.get(SearchFieldsES.DOCUMENT_TYPE).getName(), map.get(SearchFieldsES.DOCUMENT_TYPE).getValue());
+					obj.accumulate(map.get(SearchFieldsES.PROCESS_STAGE).getName(), map.get(SearchFieldsES.PROCESS_STAGE).getValue());
 					
 					jArray.add(obj);
 			}
@@ -419,6 +426,8 @@ try{
 												  .addField(SearchFieldsES.EPOCH)
 												  .addField(SearchFieldsES.SHA1)
 												  .addField(SearchFieldsES.SOURCE)
+												  .addField(SearchFieldsES.DOCUMENT_TYPE)
+												  .addField(SearchFieldsES.PROCESS_STAGE)
 												  .addSort(SearchFieldsES.EPOCH, SortOrder.DESC);
 							
 			
@@ -451,6 +460,9 @@ try{
 			obj.accumulate(map.get(SearchFieldsES.SHA1).getName(), map.get(SearchFieldsES.SHA1).getValue());
 			obj.accumulate(map.get(SearchFieldsES.SOURCE).getName(), map.get(SearchFieldsES.SOURCE).getValue());
 			obj.accumulate(map.get(SearchFieldsES.EPOCH).getName(), map.get(SearchFieldsES.EPOCH).getValue());
+			obj.accumulate(map.get(SearchFieldsES.DOCUMENT_TYPE).getName(), map.get(SearchFieldsES.DOCUMENT_TYPE).getValue());
+			obj.accumulate(map.get(SearchFieldsES.PROCESS_STAGE).getName(), map.get(SearchFieldsES.PROCESS_STAGE).getValue());
+			
 		}
 		
 		jArray.add(obj);
@@ -493,6 +505,8 @@ public String GetPagesAllEpochs(String sha, String indexName, String indexType){
 			  .addField(SearchFieldsES.EPOCH)
 			  .addField(SearchFieldsES.SHA1)
 			  .addField(SearchFieldsES.SOURCE)
+			  .addField(SearchFieldsES.DOCUMENT_TYPE)
+			  .addField(SearchFieldsES.PROCESS_STAGE)
 			  .addSort(SearchFieldsES.EPOCH, SortOrder.DESC);
 		
 		multiResp = esClient.prepareMultiSearch()
@@ -522,6 +536,9 @@ public String GetPagesAllEpochs(String sha, String indexName, String indexType){
 					obj.accumulate(map.get(SearchFieldsES.SHA1).getName(), map.get(SearchFieldsES.SHA1).getValue());
 					obj.accumulate(map.get(SearchFieldsES.SOURCE).getName(), map.get(SearchFieldsES.SOURCE).getValue());
 					obj.accumulate(map.get(SearchFieldsES.EPOCH).getName(), map.get(SearchFieldsES.EPOCH).getValue());
+					obj.accumulate(map.get(SearchFieldsES.DOCUMENT_TYPE).getName(), map.get(SearchFieldsES.DOCUMENT_TYPE).getValue());
+					obj.accumulate(map.get(SearchFieldsES.PROCESS_STAGE).getName(), map.get(SearchFieldsES.PROCESS_STAGE).getValue());
+					
 					
 					jArray.add(obj);
 			}
