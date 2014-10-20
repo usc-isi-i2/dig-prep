@@ -1,9 +1,33 @@
-import sys, os, time, socket
+import sys, os, time, calendar, socket
 
 import mysql.connector
 from azure import WindowsAzureError
 import hashlib
 from azure.storage import BlobService
+
+try:
+    import simplejson as json
+except:
+    import json
+
+### stolen from build.py
+
+def datestampToEpoch(datestamp):
+    # make up the times, just pick 12:00:01.000
+    epoch = calendar.timegm(time.strptime(datestamp + " 12:00:01 am", "%Y%m%d %I:%M:%S %p")*1000)
+    return epoch
+
+def datestampToDatestring(datestamp):
+    return time.strftime("%Y-%m-%d", time.strptime(datestamp, "%Y%m%d")) + " 12:00:01 am"
+
+def datestringToEpoch(datestring, fmt="%Y-%m-%d %H:%M:%S"):
+    epoch = calendar.timegm(time.strptime(datestring, fmt))
+    return epoch
+
+def datestringToDatestamp(datestring, fmt="%Y-%m-%d %H:%M:%S"):
+    return time.strftime("%Y%m%d", time.strptime(datestring, fmt))
+    
+### end theft
 
 myaccount="karmadigstorage"
 mykey="TJbdTjRymbBHXLsDtF/Nx3+6WXWN0uwh3RG/8GPJQRQyqg+rkOzioczm5czPtr+auGFhNeBx8GTAfuCufRyw8A=="
@@ -12,6 +36,7 @@ mycontainer='istr-memex-small-ads'
 bs = BlobService(account_name=myaccount, account_key=mykey)
 
 def publishAzureBlob(tbl='backpage_incoming',
+                     source="backpage",
                      limit=2,
                      user='sqluser', 
                      password='sqlpassword',
@@ -56,7 +81,23 @@ def publishAzureBlob(tbl='backpage_incoming',
                                                              x_ms_blob_content_type='text/html')
                         print >> sys.stderr, "repub %s as %s / %s: size=%d, status=%s" % (url, mycontainer, destination, size, status)
                         success = True
-                        print >> f, "%s\t%s" % (url, hashlib.sha1(url).hexdigest().upper())
+
+                        native_url = url
+                        cache_url = blobUrl
+                        sha1 = hashlib.sha1(native_url).hexdigest().upper()
+                        epoch = datestringToEpoch(str(modtime))
+                        # uid is Amadeep's key to the elastic search data
+                        uid = hashlib.sha1(native_url[7:]).hexdigest().upper()
+                        j = {"native_url": native_url,
+                             "cache_url": cache_url,
+                             "sha1": sha1,
+                             "epoch": epoch,
+                             "source": source,
+                             "document_type": "page",
+                             "process_stage": "raw"}
+                        print uid
+                        print j
+                        print >> f, json.dumps({uid: j}, sort_keys=True)
                         break
                     except socket.error as se:
                         remainingAttempts -= 1
@@ -65,7 +106,10 @@ def publishAzureBlob(tbl='backpage_incoming',
                     except WindowsAzureError as e:
                         print >> sys.stderr, "Azure failure [%r], skipping"
             except Exception as e:
-                print >> sys.stderr, "Total failure per %s" % e
+                print >> sys.stderr, "Total failure per [%s]" % e
 
     cnx.close()
     return urls
+
+def pab():
+    publishAzureBlob()
