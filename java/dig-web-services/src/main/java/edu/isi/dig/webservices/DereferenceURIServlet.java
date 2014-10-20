@@ -336,7 +336,6 @@ public String GetPagesURLs(String sha, String epoch,String indexName, String ind
 			  .setTypes(indexType)
 			  .addField(SearchFieldsES.NATIVE_URL)
 			  .addField(SearchFieldsES.CACHE_URL)
-			  .addField(SearchFieldsES.MEMEX_URL)
 			  .addField(SearchFieldsES.EPOCH)
 			  .addField(SearchFieldsES.SHA1)
 			  .addField(SearchFieldsES.SOURCE)
@@ -349,7 +348,6 @@ public String GetPagesURLs(String sha, String epoch,String indexName, String ind
 		  		.setTypes(indexType)
 		  		.addField(SearchFieldsES.NATIVE_URL)
 		  		.addField(SearchFieldsES.CACHE_URL)
-		  		.addField(SearchFieldsES.MEMEX_URL)
 		  		.addField(SearchFieldsES.EPOCH)
 		  		.addField(SearchFieldsES.SHA1)
 		  		.addField(SearchFieldsES.SOURCE)
@@ -380,7 +378,6 @@ public String GetPagesURLs(String sha, String epoch,String indexName, String ind
 					
 					obj.accumulate(map.get(SearchFieldsES.NATIVE_URL).getName(), map.get(SearchFieldsES.NATIVE_URL).getValue());
 					obj.accumulate(map.get(SearchFieldsES.CACHE_URL).getName(), map.get(SearchFieldsES.CACHE_URL).getValue());
-					obj.accumulate(map.get(SearchFieldsES.MEMEX_URL).getName(), map.get(SearchFieldsES.MEMEX_URL).getValue());
 					obj.accumulate(map.get(SearchFieldsES.SHA1).getName(), map.get(SearchFieldsES.SHA1).getValue());
 					obj.accumulate(map.get(SearchFieldsES.SOURCE).getName(), map.get(SearchFieldsES.SOURCE).getValue());
 					obj.accumulate(map.get(SearchFieldsES.EPOCH).getName(), map.get(SearchFieldsES.EPOCH).getValue());
@@ -394,7 +391,7 @@ public String GetPagesURLs(String sha, String epoch,String indexName, String ind
 		parentObj.accumulate(SEARCH_RESULTS, jArray);
 		return parentObj.toString();
 	}catch(Exception e){
-		return e.toString();
+		return e.getLocalizedMessage();
 	}finally{
 		
 		if(ts!=null)
@@ -422,7 +419,6 @@ try{
 												  .setTypes(indexType)
 												  .addField(SearchFieldsES.NATIVE_URL)
 												  .addField(SearchFieldsES.CACHE_URL)
-												  .addField(SearchFieldsES.MEMEX_URL)
 												  .addField(SearchFieldsES.EPOCH)
 												  .addField(SearchFieldsES.SHA1)
 												  .addField(SearchFieldsES.SOURCE)
@@ -456,7 +452,6 @@ try{
 			Map<String,SearchHitField> map = searchHitLatest.getFields();
 			obj.accumulate(map.get(SearchFieldsES.NATIVE_URL).getName(), map.get(SearchFieldsES.NATIVE_URL).getValue());
 			obj.accumulate(map.get(SearchFieldsES.CACHE_URL).getName(), map.get(SearchFieldsES.CACHE_URL).getValue());
-			obj.accumulate(map.get(SearchFieldsES.MEMEX_URL).getName(), map.get(SearchFieldsES.MEMEX_URL).getValue());
 			obj.accumulate(map.get(SearchFieldsES.SHA1).getName(), map.get(SearchFieldsES.SHA1).getValue());
 			obj.accumulate(map.get(SearchFieldsES.SOURCE).getName(), map.get(SearchFieldsES.SOURCE).getValue());
 			obj.accumulate(map.get(SearchFieldsES.EPOCH).getName(), map.get(SearchFieldsES.EPOCH).getValue());
@@ -501,7 +496,6 @@ public String GetPagesAllEpochs(String sha, String indexName, String indexType){
 			  .setTypes(indexType)
 			  .addField(SearchFieldsES.NATIVE_URL)
 			  .addField(SearchFieldsES.CACHE_URL)
-			  .addField(SearchFieldsES.MEMEX_URL)
 			  .addField(SearchFieldsES.EPOCH)
 			  .addField(SearchFieldsES.SHA1)
 			  .addField(SearchFieldsES.SOURCE)
@@ -532,7 +526,6 @@ public String GetPagesAllEpochs(String sha, String indexName, String indexType){
 					
 					obj.accumulate(map.get(SearchFieldsES.NATIVE_URL).getName(), map.get(SearchFieldsES.NATIVE_URL).getValue());
 					obj.accumulate(map.get(SearchFieldsES.CACHE_URL).getName(), map.get(SearchFieldsES.CACHE_URL).getValue());
-					obj.accumulate(map.get(SearchFieldsES.MEMEX_URL).getName(), map.get(SearchFieldsES.MEMEX_URL).getValue());
 					obj.accumulate(map.get(SearchFieldsES.SHA1).getName(), map.get(SearchFieldsES.SHA1).getValue());
 					obj.accumulate(map.get(SearchFieldsES.SOURCE).getName(), map.get(SearchFieldsES.SOURCE).getValue());
 					obj.accumulate(map.get(SearchFieldsES.EPOCH).getName(), map.get(SearchFieldsES.EPOCH).getValue());
@@ -547,6 +540,7 @@ public String GetPagesAllEpochs(String sha, String indexName, String indexType){
 		parentObj.accumulate(SEARCH_RESULTS, jArray);
 		return parentObj.toString();
 	}catch(Exception e){
+		e.printStackTrace();
 		return e.toString();
 	}finally{
 		
