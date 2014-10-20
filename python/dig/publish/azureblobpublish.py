@@ -58,19 +58,15 @@ def publishAzureBlob(tbl='backpage_incoming',
     cursor.execute(query)
 
     urls = []
-    with open('/tmp/azureblobpublish.tsv', 'w') as f:
+    with open('/tmp/azureblobpublish_ads_%s.json' % source, 'w') as f:
 
         for (url, body, modtime) in cursor:
-            print url
-            print modtime
             datestamp = modtime.strftime('%Y%m%d')
             # emulate https://karmadigstorage.blob.core.windows.net/arch/churl/20140101/olympia.backpage.com/FemaleEscorts/100-asian-hi-im-honey-n-im-super-sweet-25/13538952
             # http://karmadigstorage.blob.core.windows.net/istr-memex-small/istr_memex_small/20140101/olym...
             crawlAgent = "istr_%s" % database
             destination = os.path.join(crawlAgent, str(datestamp), url[7:])
             blobUrl = "http://karmadigstorage.blob.core.windows.net/%s/%s" % (mycontainer, destination)
-            print destination, blobUrl
-            # exit(0)
             try:
                 success = False
                 remainingAttempts = maxAttempts
@@ -95,8 +91,6 @@ def publishAzureBlob(tbl='backpage_incoming',
                              "source": source,
                              "document_type": "page",
                              "process_stage": "raw"}
-                        print uid
-                        print j
                         print >> f, json.dumps({uid: j}, sort_keys=True)
                         break
                     except socket.error as se:
