@@ -52,7 +52,7 @@ if __name__ == '__main__':
           readJsonfromFile(sys.argv[1],sys.argv[2],sys.argv[3])
 
     else:
-        print "Usage: indexreferenceurls.py <fileName> <index> <doctype> ,<fileType>"
+        print "Usage: indexreferenceurls.py <fileName> <index> <doctype> <fileType>"
 
 
     print "Done!"
