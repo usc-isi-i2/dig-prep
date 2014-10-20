@@ -5,7 +5,7 @@
   <groupId>dig-web-services</groupId>
   <artifactId>dig</artifactId>
   <version>0.0.1-SNAPSHOT</version>
-  <packaging>jar</packaging>
+  <packaging>war</packaging>
 
   <name>dig-web-services</name>
   <url>http://maven.apache.org</url>
@@ -73,6 +73,53 @@
 			<artifactId>mysql-connector-java</artifactId>
 			<version>5.1.33</version>
 		</dependency>
-	    
+		<dependency>
+			<groupId>net.sf.json-lib</groupId>
+			<artifactId>json-lib</artifactId>
+			<version>2.3</version>
+			<classifier>jdk15</classifier>
+		</dependency>
+	    <dependency>
+		    <groupId>com.google.code.gson</groupId>
+		    <artifactId>gson</artifactId>
+		    <version>2.3</version>
+		</dependency>
   </dependencies>
+  
+  <profiles>
+	<profile>
+		<id>tomcat-deploy</id>
+		<build>
+			<plugins>
+				<!-- Configuration for Tomcat -->
+				<!--
+				For Tomcat, add the following roles and user to the conf/tomcat-users.xml file as follows
+				<role rolename="manager-gui"/>
+				<role rolename="manager-script"/>
+				<user username="myusername" password="mypassword" roles="manager-gui,manager-script"/>
+				Start (or restart) your Tomcat instance to pick up the user configuration changes
+				Add a corresponding server block to your $M2_HOME/conf/settings.xml:
+				<server>
+				<id>TomcatServer</id>
+				<username>myusername</username>
+				<password>mypassword</password>
+				</server>
+				Set the tomcat url, port and path settings and then run
+				mvn package -Ptomcat-deploy tomcat:deploy
+				to deploy WAR in the tomcat container
+				-->
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>tomcat-maven-plugin</artifactId>
+					<configuration>
+						<server>TomcatServer</server>
+						<path>/</path>
+						<url>http://fusion-sqid:8080/</url>
+						<update>true</update>
+					</configuration>
+				</plugin>
+			</plugins>
+		</build>
+	</profile>
+</profiles> 
 </project>
