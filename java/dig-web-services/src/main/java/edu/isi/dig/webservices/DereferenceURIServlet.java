@@ -45,14 +45,14 @@ public class DereferenceURIServlet {
 	Settings settings = null;
 	
 	@GET
-	@Path("/images/{sha}/{epoch}/processed")
+	@Path("/images/{sha}/{epoch}/raw")
 	public String GetElasticSearchImages(@PathParam("sha") String sha, @PathParam("epoch") String epoch){
 		
 				return GetImagesURLs(sha, epoch, INDEX_IMAGES, INDEX_TYPE_IMAGE);
 	}
 	
 	@GET
-	@Path("/images/{sha}/latest/processed")
+	@Path("/images/{sha}/latest/raw")
 	public String GetElasticSearchImagesBySha(@PathParam("sha") String sha){
 			
 			return GetImageURLsBySha(sha, INDEX_IMAGES, INDEX_TYPE_IMAGE);
@@ -60,7 +60,7 @@ public class DereferenceURIServlet {
 	
 	
 	@GET
-	@Path("/images/{sha}/processed")
+	@Path("/images/{sha}/raw")
 	public String GetElasticSearchImageAllEpochs(@PathParam("sha") String sha){
 		
 		return GetImagesAllEpochs(sha, INDEX_IMAGES, INDEX_TYPE_IMAGE);
