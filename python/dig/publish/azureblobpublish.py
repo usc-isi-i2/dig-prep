@@ -21,7 +21,7 @@ def datestampToDatestring(datestamp):
     return time.strftime("%Y-%m-%d", time.strptime(datestamp, "%Y%m%d")) + " 12:00:01 am"
 
 def datestringToEpoch(datestring, fmt="%Y-%m-%d %H:%M:%S"):
-    epoch = calendar.timegm(time.strptime(datestring, fmt))
+    epoch = calendar.timegm(time.strptime(datestring, fmt)*1000)
     return epoch
 
 def datestringToDatestamp(datestring, fmt="%Y-%m-%d %H:%M:%S"):
@@ -50,7 +50,7 @@ def publishAzureBlob(tbl='backpage_incoming',
                                   database=database)
     cursor = cnx.cursor()
 
-    query = (("""SELECT t.url, t.body, a.modtime FROM %s t join ads a on a.url=t.url """ % tbl) + 
+    query = (("""SELECT t.url, t.body, a.importtime FROM %s t join ads a on a.url=t.url """ % tbl) + 
              (""" LIMIT %s"""))
 
     query = query % (limit)
@@ -60,8 +60,8 @@ def publishAzureBlob(tbl='backpage_incoming',
     urls = []
     with open('/tmp/azureblobpublish_ads_%s.json' % source, 'w') as f:
 
-        for (url, body, modtime) in cursor:
-            datestamp = modtime.strftime('%Y%m%d')
+        for (url, body, importtime) in cursor:
+            datestamp = importtime.strftime('%Y%m%d')
             # emulate https://karmadigstorage.blob.core.windows.net/arch/churl/20140101/olympia.backpage.com/FemaleEscorts/100-asian-hi-im-honey-n-im-super-sweet-25/13538952
             # http://karmadigstorage.blob.core.windows.net/istr-memex-small/istr_memex_small/20140101/olym...
             crawlAgent = "istr_%s" % database
@@ -81,7 +81,7 @@ def publishAzureBlob(tbl='backpage_incoming',
                         native_url = url
                         cache_url = blobUrl
                         sha1 = hashlib.sha1(native_url).hexdigest().upper()
-                        epoch = datestringToEpoch(str(modtime))
+                        epoch = datestringToEpoch(str(importtime))
                         # uid is Amadeep's key to the elastic search data
                         uid = hashlib.sha1(native_url[7:]).hexdigest().upper()
                         j = {"native_url": native_url,
