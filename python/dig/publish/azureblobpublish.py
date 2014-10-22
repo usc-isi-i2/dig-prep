@@ -4,6 +4,7 @@ import mysql.connector
 from azure import WindowsAzureError
 import hashlib
 from azure.storage import BlobService
+from util import echo
 
 try:
     import simplejson as json
@@ -14,14 +15,14 @@ except:
 
 def datestampToEpoch(datestamp):
     # make up the times, just pick 12:00:01.000
-    epoch = calendar.timegm(time.strptime(datestamp + " 12:00:01 am", "%Y%m%d %I:%M:%S %p")*1000)
+    epoch = 1000*calendar.timegm(time.strptime(datestamp + " 12:00:01 am", "%Y%m%d %I:%M:%S %p"))
     return epoch
 
 def datestampToDatestring(datestamp):
     return time.strftime("%Y-%m-%d", time.strptime(datestamp, "%Y%m%d")) + " 12:00:01 am"
 
 def datestringToEpoch(datestring, fmt="%Y-%m-%d %H:%M:%S"):
-    epoch = calendar.timegm(time.strptime(datestring, fmt)*1000)
+    epoch = 1000*calendar.timegm(time.strptime(datestring, fmt))
     return epoch
 
 def datestringToDatestamp(datestring, fmt="%Y-%m-%d %H:%M:%S"):
@@ -33,6 +34,7 @@ myaccount="karmadigstorage"
 mykey="TJbdTjRymbBHXLsDtF/Nx3+6WXWN0uwh3RG/8GPJQRQyqg+rkOzioczm5czPtr+auGFhNeBx8GTAfuCufRyw8A=="
 mycontainer='arch'
 mycontainer='istr-memex-small-ads'
+mycontainer='memex-small'
 bs = BlobService(account_name=myaccount, account_key=mykey)
 
 def publishAzureBlob(tbl='backpage_incoming',
@@ -63,7 +65,7 @@ def publishAzureBlob(tbl='backpage_incoming',
         for (url, body, importtime) in cursor:
             datestamp = importtime.strftime('%Y%m%d')
             # emulate https://karmadigstorage.blob.core.windows.net/arch/churl/20140101/olympia.backpage.com/FemaleEscorts/100-asian-hi-im-honey-n-im-super-sweet-25/13538952
-            # http://karmadigstorage.blob.core.windows.net/istr-memex-small/istr_memex_small/20140101/olym...
+            # http://karmadigstorage.blob.core.windows.net/memex-small/istr_memex_small/20140101/olym...
             crawlAgent = "istr_%s" % database
             destination = os.path.join(crawlAgent, str(datestamp), url[7:])
             blobUrl = "http://karmadigstorage.blob.core.windows.net/%s/%s" % (mycontainer, destination)
@@ -107,3 +109,15 @@ def publishAzureBlob(tbl='backpage_incoming',
 
 def pab():
     publishAzureBlob()
+
+def pab_backpage():
+    publishAzureBlob(tbl='backpage_incoming', source='backpage', limit=sys.maxint)
+
+def pab_craigslist():
+    publishAzureBlob(tbl='craigslist_incoming', source='craigslist', limit=sys.maxint)
+
+def pab_myproviderguide():
+    publishAzureBlob(tbl='myproviderguide_incoming', source='myproviderguide', limit=sys.maxint)
+
+def pab_naughtyreviews():
+    publishAzureBlob(tbl='naughtyreviews_incoming', source='naughtyreviews', limit=sys.maxint)
