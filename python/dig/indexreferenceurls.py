@@ -28,7 +28,7 @@ def readJsonfromFile(filename, index, doctype):
 
 def indexURL(filename, index, doctype):
     try:
-        
+
         with open(filename) as f:
             lines = f.readlines()
 
@@ -46,9 +46,9 @@ def indexURL(filename, index, doctype):
 if __name__ == '__main__':
 
     if len(sys.argv) == 5:
-        if sys.argv[4] == 0: #separate id included in json for indexing, Andrew's format
+        if sys.argv[4] == "0": #separate id included in json for indexing, Andrew's format
             indexURL(sys.argv[1], sys.argv[2], sys.argv[3])
-        elif sys.argv[4] == 1: #separate id read from URI in json for indexing, Pedro's format
+        elif sys.argv[4] == "1": #separate id read from URI in json for indexing, Pedro's format
             readJsonfromFile(sys.argv[1], sys.argv[2], sys.argv[3])
 
     else:
