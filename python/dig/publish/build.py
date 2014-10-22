@@ -14,6 +14,7 @@ import mysql.connector
 import csv
 
 from util import echo
+from dateutil import datestampToEpoch, datestampToDatestring, datestringToEpoch, datestringToDatestamp
 
 def fetch_ads(limit=5, retries=5):
     success = False
@@ -81,21 +82,7 @@ def load_images(limit=5, retries=5,pathname="/tmp/istr_memex_small_images.tsv"):
             if limit <= 0:
                 break
 
-def datestampToEpoch(datestamp):
-    # make up the times, just pick 12:00:01.000
-    epoch = calendar.timegm(time.strptime(datestamp + " 12:00:01 am", "%Y%m%d %I:%M:%S %p")*1000)
-    return epoch
 
-def datestampToDatestring(datestamp):
-    return time.strftime("%Y-%m-%d", time.strptime(datestamp, "%Y%m%d")) + " 12:00:01 am"
-
-def datestringToEpoch(datestring, fmt="%Y-%m-%d %H:%M:%S"):
-    epoch = calendar.timegm(time.strptime(datestring, fmt))
-    return epoch
-
-def datestringToDatestamp(datestring, fmt="%Y-%m-%d %H:%M:%S"):
-    return time.strftime("%Y%m%d", time.strptime(datestring, fmt))
-    
 def downloadImage(url):
     response = requests.get(url)
     if response.status_code == 200:
@@ -3384,8 +3371,9 @@ def process_isi_images(urls=ISI_IMAGE_URLS):
 # or 
 # ["http://www.myproviderguide.com/p/f0d4143f7773418d0b72484cb5ce628b.jpg","2014-06-10 17:48:33","2014-07-16 03:27:34","https://s3.amazonaws.com/roxyimages/d80a523daa921c678c4202b07f801dec14fca069.jpg"]
 
-def process_istr_images(urls=ISTR_IMAGE_URLS,printEvery=100,computeContentUrls=True):
+def process_istr_images(urls=ISTR_IMAGE_URLS,printEvery=100,computeContentUrls=False, limit=10):
     count = 0
+    remaining = limit
     for (native_url,importtime,modtime,cache_url,source) in urls:
         try:
             native_url = native_url
@@ -3403,7 +3391,7 @@ def process_istr_images(urls=ISTR_IMAGE_URLS,printEvery=100,computeContentUrls=T
 
             epoch = None
             try:
-                epoch = calendar.timegm(time.strptime(modtime, "%Y-%m-%d %H:%M:%S"))
+                epoch = datestringToEpoch(str(importtime))
             except:
                 pass
             isig = None
@@ -3413,19 +3401,25 @@ def process_istr_images(urls=ISTR_IMAGE_URLS,printEvery=100,computeContentUrls=T
                 except:
                     pass
 
-            memex_url =  "http://%s/crawl/%s-%s" % (host, sig, epoch)
-            content_url = "http://%s/image/%s-%s" % (host, isig, epoch)
+            # memex_url =  "http://%s/crawl/%s-%s" % (host, sig, epoch)
+            # content_url = "http://%s/image/%s-%s" % (host, isig, epoch)
             d[uid] = {"native_url": native_url,
                       "cache_url": cache_url,
-                      "memex_url": memex_url,
-                      "content_url": content_url,
+                      # "memex_url": memex_url,
+                      # "content_url": content_url,
                       "source": source,
                       "epoch": epoch,
                       "sha1": sig,
-                      "content_sha1": isig}
+                      # "content_sha1": isig
+                      "document_type": "image",
+                      "process_stage": "raw"
+                      }
             count += 1
+            remaining -= 1
             if printEvery and (count % printEvery == 0):
                 print count
+            if remaining <= 0:
+                break
         except Exception as e:
             print >> sys.stderr, "Exception %r ignored" % e
     return count
@@ -3535,4 +3529,4 @@ def dumpBuild2():
         for k,v in d.iteritems():
             print >> f, json.dumps({k: v}, sort_keys=True)
 
-process_istr_ads(load_ads())
+# process_istr_ads(load_ads())
