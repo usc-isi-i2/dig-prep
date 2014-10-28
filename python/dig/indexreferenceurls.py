@@ -9,7 +9,7 @@ from sys import stderr
 import sys
 import re
 
-es = Elasticsearch([{'host': 'localhost', 'port': 9200}])
+es = Elasticsearch([{'host': 'karma-dig-service.cloudapp.net', 'port': 55310}])
 
 #fileName = "build.json"
 
