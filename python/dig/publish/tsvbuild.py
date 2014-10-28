@@ -58,38 +58,40 @@ d = {}
 def process_inputs(tuples=[], limit=sys.maxint):
     global d
     count = 0
-    for (native_url,cache_url,sha1,epoch) in tuples:
-        try:
-            # sans http://
-            uid = hashlib.sha1(native_url[7:]).hexdigest().upper()
+    with open('/tmp/inputs.json','w') as f:
+        for (native_url,cache_url,sha1,epoch) in tuples:
+            try:
+                # sans http://
+                uid = hashlib.sha1(native_url[7:]).hexdigest().upper()
 
-            # in general these might be distinct
-            # cache_url = native_url
-            # some doubt that this is complete?
-            # datestamp = datestringToDatestamp(importtime)
-            # cache_url = "https://karmadigstorage.blob.core.windows.net/arch/istr_memex_large/%s/%s" % (datestamp, native_url[7:])
+                # in general these might be distinct
+                # cache_url = native_url
+                # some doubt that this is complete?
+                # datestamp = datestringToDatestamp(importtime)
+                # cache_url = "https://karmadigstorage.blob.core.windows.net/arch/istr_memex_large/%s/%s" % (datestamp, native_url[7:])
 
-            sig = sha1
-            stage = "text"
-            db_url = "http://karma-dig-service.cloudapp.net:55333/db/host/karma-dig-db.cloudapp.net/database/memex_large/table/ads/%s/%s/%s" % (sha1, epoch, stage)
-            source = urlToSource(native_url)
+                sig = sha1
+                stage = "text"
+                db_url = "http://karma-dig-service.cloudapp.net:55333/db/host/karma-dig-db.cloudapp.net/database/memex_large/table/ads/%s/%s/%s" % (sha1, epoch, stage)
+                source = urlToSource(native_url)
 
-            d[uid] = {"native_url": native_url,
-                      "cache_url": cache_url,
-                      "db_url": db_url,
-                      "sha1": sig,
-                      "epoch": epoch,
-                      "source": source,
-                      "document_type": "page",
-                      "process_stage": stage}
-            count += 1
-        except Exception as e:
-            print >> sys.stderr, "Exception %r ignored" % e
-            raise
-        limit -= 1
-        if limit <= 0:
-            break
-    return count
+                obj = {"native_url": native_url,
+                       "cache_url": cache_url,
+                       "db_url": db_url,
+                       "sha1": sig,
+                       "epoch": epoch,
+                       "source": source,
+                       "document_type": "page",
+                       "process_stage": stage}
+                count += 1
+                print >> f, json.dumps({uid: obj}, sort_keys=True)
+            except Exception as e:
+                print >> sys.stderr, "Exception %r ignored, row %d skipped" % (e, count)
+                raise
+            limit -= 1
+            if limit <= 0:
+                break
+        return count
 
 def dump_inputs():
     global d
@@ -101,3 +103,5 @@ def dump_inputs():
 def z(limit):
     process_inputs(load_inputs(limit=limit))
     dump_inputs()
+
+process_inputs(load_inputs(limit=sys.maxint), limit=sys.maxint)
