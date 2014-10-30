@@ -5,14 +5,14 @@ import mysql.connector
 import argparse
 import urlparse
 from itertools import count, izip
-from dig.pymod.util import interpretCmdLine
+from dig.pymod.util import interpretCmdLine, echo
 
 HOST='karma-dig-db.cloudapp.net'
 USER='sqluser'
 PASSWORD='sqlpassword'
-DATABASE='memex_small'
+DATABASE='memex_large'
 QUERY='select text from ads'
-LIMIT=10
+LIMIT=3
 MAXATTEMPTS=3
 
 OUTFILE='/tmp/db2json.json'
@@ -25,16 +25,18 @@ def db2json(outstream=sys.stdout,
             query=QUERY,
             limit=LIMIT,
             maxAttempts=MAXATTEMPTS,
-            unwrap=False):
+            tab=False):
 
     def emit(item, stream):
         """JSON-encode all data except URLs"""
         try:
-            u = urlparse(item)
-            if u.scheme:
+            u = urlparse.urlparse(item)
+            # Want to trigger if the payload starts with http
+            # but not if merely starts with a URL
+            if u.scheme and u.scheme in ['http', 'https'] and ' ' not in item and len(item)<150:
                 stream.write(item)
-            return
-        except:
+                return
+        except Exception as e:
             pass
         stream.write(json.dumps(item, sort_keys=True))
 
@@ -49,13 +51,18 @@ def db2json(outstream=sys.stdout,
 
     tally = 0
     for (values) in cursor:
-        if not unwrap:
+        if not tab:
             outstream.write("[")
-        for (value, remaining) in izip(values, xrange(len(values)-1, -1, -1)):
+        remaining = len(values)
+        for value in values:
             emit(value, outstream)
+            remaining -= 1
             if remaining>0:
-                oustream.write(", ")
-        if not unwrap:
+                if tab:
+                    outstream.write("\t")
+                else:
+                    outstream.write(", ")
+        if not tab:
             outstream.write("]")
         outstream.write('\n')
         tally += 1
@@ -72,21 +79,24 @@ def main(argv=None):
     parser.add_argument('-q','--query', 
                         help='query or query file', 
                         default=QUERY)
-    parser.add_argument('-u','--unwrap', 
-                        help='drop outer brackets', 
+    parser.add_argument('-t','--tab', 
+                        help='drop outer brackets, use tab separators', 
                         required=False, 
                         action='store_true')
     args = parser.parse_args(args)
     try:
         if os.path.exists(args.query):
-            args.query = args.query.open().read()
-    except:
-        print >> sys.stderr, "Failed to open %s, using as as query" % args.query
+            args.query = open(args.query, 'r').read()
+    except Exception as e:
+        print >> sys.stderr, "Failed to open %s [%r], using as as query" % (args.query, e)
+    print >> sys.stderr, "output %s" % args.output
+    print >> sys.stderr, "query %s" % args.query
+    print >> sys.stderr, "tab %s" % args.tab
     if args.output:
         with open(args.output, "w") as f:
-            db2json(outstream=f, query=args.query, unwrap=args.unwrap)
+            db2json(outstream=f, query=args.query, tab=args.tab, limit=5000)
     else:
-        db2json(sys.stdout, query=args.query, unwrap=args.unwrap)
+        db2json(sys.stdout, query=args.query, tab=args.tab, limit=5000)
 
 # call main() if this is run as standalone
 if __name__ == "__main__":
