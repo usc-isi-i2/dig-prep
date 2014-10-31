@@ -16,7 +16,36 @@ class OKHttpStatus(HttpStatus):
     code = 200
     name = "OK"
     def explain(self):
-        print "OK %s" % os.environ["REQUEST_URI"] 
+        print "OK %s" % os.environ["REQUEST_URI"]
+
+class FoundHttpStatus(HttpStatus):
+    """Not used anymore"""
+    def __init__(self, location, mimeType="text/plain"):
+        self.location = location
+        self.mimeType = mimeType
+    # Used to implement the redirect
+    code = 302
+    name = "Found"
+    def report(self):
+        print "Status: %d %s" % (self.code, self.name)
+        print "Location: %s\n" % (self.location)
+
+    def explain(self):
+        print "Redirect %s to %s" % (os.environ["REQUEST_URI"], self.location)
+
+class SeeOtherHttpStatus(HttpStatus):
+    def __init__(self, location, mimeType="text/plain"):
+        self.location = location
+        self.mimeType = mimeType
+    # Used to implement the redirect
+    code = 303
+    name = "See Other"
+    def report(self):
+        print "Status: %d %s" % (self.code, self.name)
+        print "Location: %s\n" % (self.location)
+
+    def explain(self):
+        print "Redirect %s to %s" % (os.environ["REQUEST_URI"], self.location)
 
 class NotFoundHttpStatus(HttpStatus):
     # No results: 404 does not exist
@@ -34,6 +63,8 @@ class InternalServerErrorHttpStatus(HttpStatus):
 
     def explain(self):
         print "Server failed (e) on resource %s" % os.environ["REQUEST_URI"]
+        if self.exception:
+            print "Internal error was (%r)" % (self.exception)
 
 class NotImplementedHttpStatus(HttpStatus):
     code = 501
