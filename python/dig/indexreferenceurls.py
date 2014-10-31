@@ -9,7 +9,7 @@ from sys import stderr
 import sys
 import re
 
-es = Elasticsearch([{'host': 'localhost', 'port': 9200}])
+es = Elasticsearch([{'host': 'karma-dig-service.cloudapp.net', 'port': 55310}])
 
 #fileName = "build.json"
 
@@ -19,7 +19,7 @@ def readJsonfromFile(filename, index, doctype):
         with open(filename) as f:
             d = json.load(f)
             for fc in d:
-                sha1 = re.findall('([a-f0-9]{40})',fc["uri"]) #find all sha from the uri
+                sha1 = re.findall('([A-F0-9]{40})',fc["uri"]) #find all sha from the uri
                 urisha = sha1[0].upper() #there should be only one sha1 hex in the url
                 print "indexing id: " + urisha
                 es.index(index=index,doc_type=doctype,id=urisha,body=fc)
