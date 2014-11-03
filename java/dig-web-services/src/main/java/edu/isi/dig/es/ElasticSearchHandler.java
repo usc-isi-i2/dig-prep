@@ -4,6 +4,7 @@ import java.util.Map;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import net.sf.json.JSONSerializer;
 
 import org.elasticsearch.action.search.MultiSearchResponse;
 import org.elasticsearch.action.search.SearchRequestBuilder;
@@ -23,22 +24,22 @@ import edu.isi.dig.webservices.SearchFieldsES;
 public class ElasticSearchHandler {
 	
 	
-	final String SEARCH_RESULTS="results";
-	final String CLUSTER_NAME = "cluster.name";
-	final String CLUSTER_NAME_VALUE = "dig_isi";
-	final String ELASTICSEARCH_HOST = "karma-dig-service.cloudapp.net"; 
-	final int ELASTICSEARCH_PORT = 55309;
+	final static String SEARCH_RESULTS="results";
+	final static String CLUSTER_NAME = "cluster.name";
+	final static String CLUSTER_NAME_VALUE = "dig_isi";
+	final static String ELASTICSEARCH_HOST = "karma-dig-service.cloudapp.net"; 
+	final static int ELASTICSEARCH_PORT = 55309;
 	
-	Client esClient=null;
-	TransportClient ts =null;
-	MultiSearchResponse multiResp = null;
+	static Client esClient=null;
+	static TransportClient ts =null;
+	static MultiSearchResponse multiResp = null;
 	
 			
-	Settings settings = null;
+	static Settings settings = null;
 	
 	
 	
-	public String GetImagesURLs(String sha, String epoch,String indexName, String indexType){
+	public static String GetImagesURLs(String sha, String epoch,String indexName, String indexType){
 		
 		try{
 			settings = ImmutableSettings.settingsBuilder()
@@ -120,8 +121,7 @@ public class ElasticSearchHandler {
 				
 	}
 
-
-	public String GetImageURLsBySha(String sha, String indexName, String indexType){
+	public static String GetImageURLsBySha(String sha, String indexName, String indexType){
 	try{
 			
 			if(sha.trim() != "")
@@ -201,7 +201,7 @@ public class ElasticSearchHandler {
 		
 	}
 	
-	public String GetImagesAllEpochs(String sha, String indexName, String indexType){
+	public static String GetImagesAllEpochs(String sha, String indexName, String indexType){
 		
 		try{
 			settings = ImmutableSettings.settingsBuilder()
@@ -271,7 +271,7 @@ public class ElasticSearchHandler {
 				
 	}
 
-	public String GetPagesURLs(String sha, String epoch,String indexName, String indexType){
+	public static String GetPagesURLs(String sha, String epoch,String indexName, String indexType){
 	
 	try{
 		settings = ImmutableSettings.settingsBuilder()
@@ -351,8 +351,7 @@ public class ElasticSearchHandler {
 			
 }
 
-
-	public String GetPageURLsBySha(String sha, String indexName, String indexType){
+	public static String GetPageURLsBySha(String sha, String indexName, String indexType){
 try{
 		
 		if(sha.trim() != "")
@@ -431,7 +430,7 @@ try{
 	
 }
 
-	public String GetPagesAllEpochs(String sha, String indexName, String indexType){
+	public static String GetPagesAllEpochs(String sha, String indexName, String indexType){
 	
 	try{
 		settings = ImmutableSettings.settingsBuilder()
@@ -501,4 +500,119 @@ try{
 			
 }
 
+	public static String GetElasticSearchAds(String sha, String epoch, String indexName, String indexType){
+		
+		try {
+			settings = ImmutableSettings.settingsBuilder()
+						.put(CLUSTER_NAME, CLUSTER_NAME_VALUE).build();
+			ts = new TransportClient(settings);
+			esClient = ts.addTransportAddress(new InetSocketTransportAddress(ELASTICSEARCH_HOST, ELASTICSEARCH_PORT));
+			
+			StringBuffer sbURI = new StringBuffer();
+			sbURI.append("http://memex.zapto.org/data/page/");
+			sbURI.append(sha.trim());
+			sbURI.append("/");
+			sbURI.append(epoch);
+			sbURI.append("/");
+			sbURI.append("processed");
+			
+			SearchRequestBuilder srbURI = esClient.prepareSearch()
+												  .setQuery(QueryBuilders.matchQuery(SearchFieldsES.URI, sbURI.toString().trim()))
+												  .setIndices(indexName)
+												  .setTypes(indexType)
+												  .setSize(1);//best match should be returned
+												  
+			
+			multiResp = esClient.prepareMultiSearch()
+					.add(srbURI)
+					.execute()
+					.actionGet();
+			
+			
+			MultiSearchResponse.Item item = multiResp.getResponses()[0];	//should be the first one, no point of getting more than responses.
+																			// will check the ElasticCode later to understand it better
+
+			SearchHit[] searchHit;
+			
+			SearchResponse searchResp = item.getResponse();
+			searchHit = searchResp.getHits().getHits();
+			
+			if(searchHit.length > 0 && searchHit.length == 1) {
+				return searchHit[0].getSourceAsString();
+			}
+			else{
+				
+				throw new Exception("Web page not found or multiple web pages found");
+			}
+	
+		}catch(Exception e){
+			e.printStackTrace();
+			return e.toString();
+		}finally{
+			
+			if(ts!=null)
+				ts.close();
+			if(esClient!=null)
+				esClient.close();
+		}
+	}
+	
+public static String GetElasticSearchFeatureCollection(String sha, String epoch, String indexName, String indexType){
+		
+		try {
+			settings = ImmutableSettings.settingsBuilder()
+						.put(CLUSTER_NAME, CLUSTER_NAME_VALUE).build();
+			ts = new TransportClient(settings);
+			esClient = ts.addTransportAddress(new InetSocketTransportAddress(ELASTICSEARCH_HOST, ELASTICSEARCH_PORT));
+			
+			StringBuffer sbURI = new StringBuffer();
+			sbURI.append("http://memex.zapto.org/data/page/");
+			sbURI.append(sha.trim());
+			sbURI.append("/");
+			sbURI.append(epoch);
+			sbURI.append("/");
+			sbURI.append("processed");
+			
+			SearchRequestBuilder srbURI = esClient.prepareSearch()
+												  .setQuery(QueryBuilders.matchQuery(SearchFieldsES.URI, sbURI.toString().trim()))
+												  .setIndices(indexName)
+												  .setTypes(indexType)
+												  .setSize(1);//best match should be returned
+												  
+			
+			multiResp = esClient.prepareMultiSearch()
+					.add(srbURI)
+					.execute()
+					.actionGet();
+			
+			
+			MultiSearchResponse.Item item = multiResp.getResponses()[0];	//should be the first one, no point of getting more than responses.
+																			// will check the ElasticCode later to understand it better
+
+			SearchHit[] searchHit;
+			
+			SearchResponse searchResp = item.getResponse();
+			searchHit = searchResp.getHits().getHits();
+						
+			if(searchHit.length > 0 && searchHit.length == 1) {
+				JSONObject jObj = (JSONObject) JSONSerializer.toJSON(searchHit[0].getSourceAsString());
+				return jObj.getString("hasFeatureCollection");
+			}
+			else{
+				
+				throw new Exception("Web page not found or multiple web pages found");
+			}
+	
+		}catch(Exception e){
+			e.printStackTrace();
+			return e.toString();
+		}finally{
+			
+			if(ts!=null)
+				ts.close();
+			if(esClient!=null)
+				esClient.close();
+		}
+	}
+	
 }
