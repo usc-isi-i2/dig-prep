@@ -42,11 +42,11 @@ PAYLOADS = {
 MIME_TYPES = {
     # maps (<scope>, <stage>) into a function generate the type to return from ES result
     # None means we don't do the MIME stuff, we redirect and count on the end destination server to handle
-    ("page", "raw"): None,
+    ("page", "raw"): lambda(j): None,
     ("page", "processed"): lambda(j): "application/json",
     ("page", "featurecollection"): "application/json",
 
-    ("image", "raw"): None,
+    ("image", "raw"): lambda(j): None,
     ("image", "processed"): lambda(j): "application/json",
     ("image", "featurecollection"): "application/json",
     }
@@ -77,7 +77,7 @@ def fetch(sha1, epoch,
 
         url = template % (host, port, mapping[scope], sha1, epoch, stage)
         if verbose:
-            print >> sys.stderr, "url %r" % url
+            print >> sys.stderr, "templated url %r" % url
         response = requests.get(url)
         if verbose:
             print >> sys.stderr, "scope %r" % (scope)
@@ -87,16 +87,23 @@ def fetch(sha1, epoch,
             print >> sys.stderr, "response %r" % response
             print >> sys.stderr, "response text %r" % response.text
             print >> sys.stderr, "response status %r" % response.status_code
+            # this is the response content type
+            print >> sys.stderr, "response content type %r" % response.headers['content-type']
         if response.status_code != 200:
             # If ES didn't recognize, treat as 404
             raise NotFoundHttpStatus()
         dct = json.loads(response.text)
         if verbose:
-            print >> sys.stderr, "dct %r" % dct
+            print >> sys.stderr, json.dumps(dct, sort_keys=True, indent=4)
+        # dct might be a set of one or more results, represented as {"results": [r1, r2]}
+        # or it might be a single result {"a:" ...}
         results = dct and dct.get("results")
+        single = dct and dct.get("a") and dct
         # results should be a list of json objects
         if verbose:
-            print >> sys.stderr, "results %r" % results
+            print >> sys.stderr, "raw results %r" % (results or single)
+        if single:
+            return (payload(single), mime_type(single))
         if results:
             if isinstance(results, list):
                 if len(results) == 1:
@@ -166,8 +173,8 @@ def handleRedirect(scope="page", stage="raw", debug=False, verbose=VERBOSE):
             print >> sys.stderr, "contentType %s" % contentType
         print "Content-type: %s" % (contentType)
         print
-        # needs to be more sophisticated
-        print "%s" % value
+        # needs to be more sophisticated?
+        print "%s" % json.dumps(value)
     except HttpStatus as status:
         # even redirects handled here now
         if debug:
