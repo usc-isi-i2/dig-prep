@@ -2,6 +2,14 @@
 # Enable Rewriting
 RewriteEngine on
 
+# <IfModule mod_headers.c>
+#   Header set Animal cow
+#   Header set Animal monkey
+#   Header append Animal camel
+# </IfModule>
+
+Header echo ^.*
+
 ErrorDocument 404 /cgi-bin/404.py
  
 # IMAGES
