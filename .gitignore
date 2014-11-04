@@ -12,3 +12,17 @@
 hs_err_pid*
 
 *.pyc
+
+java_pid*.hprof
+bin
+target
+preloaded-library
+temp/
+.DS_Store
+.project
+.classpath
+.idea/
+.settings/
+
+*.properties
+
