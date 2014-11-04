@@ -1,0 +1,103 @@
+<html>
+<head>
+<!--
+<script>
+// adapted from http://stackoverflow.com/a/133997/2077242
+function post(path, params, method) {
+    method = method || "post"; // Set method to post by default if not specified.
+
+    // The rest of this code assumes you are not using a library.
+    // It can be made less wordy if you use one.
+    var form = document.createElement("form");
+    form.setAttribute("method", method);
+    form.setAttribute("action", path);
+
+    for(var key in params) {
+        if(params.hasOwnProperty(key)) {
+            var hiddenField = document.createElement("input");
+            hiddenField.setAttribute("type", "hidden");
+            hiddenField.setAttribute("name", key);
+            hiddenField.setAttribute("value", params[key]);
+
+            form.appendChild(hiddenField);
+         }
+    }
+
+    document.body.appendChild(form);
+    form.submit();
+}
+</script>
+-->
+</head>
+<body>
+<!--
+<a href="js:post('/action/', {name: 'John'}, 'post'">JS link</a>
+<br/>
+<a href="javascript:void(0)" onclick="post('http://memex.zapto.org/data/page/633A84DF6ABECAAC217E09604D66233661AF7CBF/1396493688000/raw', {name: 'John'}, 'post');">Run JavaScript Code</a>
+-->
+<ul>
+<br/>RAW PAGES<br/>
+<li>backpage page <a href="http://memex.zapto.org/data/page/633A84DF6ABECAAC217E09604D66233661AF7CBF/1396493688000/raw">http://memex.zapto.org/data/page/633A84DF6ABECAAC217E09604D66233661AF7CBF/1396493688000/raw</a></li>
+<li>craigslist page <a href="http://memex.zapto.org/data/page/6D1363B6238AD3F1DAEA10353C6FC09E31E9320A/1396488348000/raw">http://memex.zapto.org/data/page/6D1363B6238AD3F1DAEA10353C6FC09E31E9320A/1396488348000/raw</a></li>
+<li>myproviderguide page <a href="http://memex.zapto.org/data/page/4D2CF22867F2F319AAE88CB17CFF4DF3BD043703/1396486522000/raw">http://memex.zapto.org/data/page/4D2CF22867F2F319AAE88CB17CFF4DF3BD043703/1396486522000/raw</a></li>
+<li>naughtyreviews page <a href="http://memex.zapto.org/data/page/62CE7176211EB1B5626CADC6BC86E3E49C594E9D/1396486764000/raw">http://memex.zapto.org/data/page/62CE7176211EB1B5626CADC6BC86E3E49C594E9D/1396486764000/raw</a></li>
+
+<br/>PROCESSED PAGES<br/>
+<li>backpage page <a href="http://memex.zapto.org/data/page/633A84DF6ABECAAC217E09604D66233661AF7CBF/1396493688000/processed">http://memex.zapto.org/data/page/633A84DF6ABECAAC217E09604D66233661AF7CBF/1396493688000/processed</a></li>
+<li>craigslist page <a href="http://memex.zapto.org/data/page/6D1363B6238AD3F1DAEA10353C6FC09E31E9320A/1396488348000/processed">http://memex.zapto.org/data/page/6D1363B6238AD3F1DAEA10353C6FC09E31E9320A/1396488348000/processed</a></li>
+<li>myproviderguide page <a href="http://memex.zapto.org/data/page/4D2CF22867F2F319AAE88CB17CFF4DF3BD043703/1396486522000/processed">http://memex.zapto.org/data/page/4D2CF22867F2F319AAE88CB17CFF4DF3BD043703/1396486522000/processed</a></li>
+<li>naughtyreviews page <a href="http://memex.zapto.org/data/page/62CE7176211EB1B5626CADC6BC86E3E49C594E9D/1396486764000/processed">http://memex.zapto.org/data/page/62CE7176211EB1B5626CADC6BC86E3E49C594E9D/1396486764000/processed</a></li>
+
+<br/>EXTRACTED PAGES (handled by redirect to /processed)<br/>
+<li>backpage page <a href="http://memex.zapto.org/data/page/633A84DF6ABECAAC217E09604D66233661AF7CBF/1396493688000/extracted">http://memex.zapto.org/data/page/633A84DF6ABECAAC217E09604D66233661AF7CBF/1396493688000/extracted</a></li>
+<li>craigslist page <a href="http://memex.zapto.org/data/page/6D1363B6238AD3F1DAEA10353C6FC09E31E9320A/1396488348000/extracted">http://memex.zapto.org/data/page/6D1363B6238AD3F1DAEA10353C6FC09E31E9320A/1396488348000/extracted</a></li>
+<li>myproviderguide page <a href="http://memex.zapto.org/data/page/4D2CF22867F2F319AAE88CB17CFF4DF3BD043703/1396486522000/extracted">http://memex.zapto.org/data/page/4D2CF22867F2F319AAE88CB17CFF4DF3BD043703/1396486522000/extracted</a></li>
+<li>naughtyreviews page <a href="http://memex.zapto.org/data/page/62CE7176211EB1B5626CADC6BC86E3E49C594E9D/1396486764000/extracted">http://memex.zapto.org/data/page/62CE7176211EB1B5626CADC6BC86E3E49C594E9D/1396486764000/extracted</a></li>
+
+<br/>PAGE FEATURECOLLECTIONS<br/>
+<li>backpage page <a href="http://memex.zapto.org/data/page/633A84DF6ABECAAC217E09604D66233661AF7CBF/1396493688000/featurecollection">http://memex.zapto.org/data/page/633A84DF6ABECAAC217E09604D66233661AF7CBF/1396493688000/featurecollection</a></li>
+<li>craigslist page <a href="http://memex.zapto.org/data/page/6D1363B6238AD3F1DAEA10353C6FC09E31E9320A/1396488348000/featurecollection">http://memex.zapto.org/data/page/6D1363B6238AD3F1DAEA10353C6FC09E31E9320A/1396488348000/featurecollection</a></li>
+<li>myproviderguide page <a href="http://memex.zapto.org/data/page/4D2CF22867F2F319AAE88CB17CFF4DF3BD043703/1396486522000/featurecollection">http://memex.zapto.org/data/page/4D2CF22867F2F319AAE88CB17CFF4DF3BD043703/1396486522000/featurecollection</a></li>
+<li>naughtyreviews page <a href="http://memex.zapto.org/data/page/62CE7176211EB1B5626CADC6BC86E3E49C594E9D/1396486764000/featurecollection">http://memex.zapto.org/data/page/62CE7176211EB1B5626CADC6BC86E3E49C594E9D/1396486764000/featurecollection</a></li>
+
+<br/>PAGES with no stage (handled by redirecting to /raw)<br/>
+<li>backpage page <a href="http://memex.zapto.org/data/page/633A84DF6ABECAAC217E09604D66233661AF7CBF/1396493688000">http://memex.zapto.org/data/page/633A84DF6ABECAAC217E09604D66233661AF7CBF/1396493688000</a></li>
+<li>craigslist page <a href="http://memex.zapto.org/data/page/6D1363B6238AD3F1DAEA10353C6FC09E31E9320A/1396488348000">http://memex.zapto.org/data/page/6D1363B6238AD3F1DAEA10353C6FC09E31E9320A/1396488348000</a></li>
+<li>myproviderguide page <a href="http://memex.zapto.org/data/page/4D2CF22867F2F319AAE88CB17CFF4DF3BD043703/1396486522000">http://memex.zapto.org/data/page/4D2CF22867F2F319AAE88CB17CFF4DF3BD043703/1396486522000</a></li>
+<li>naughtyreviews page <a href="http://memex.zapto.org/data/page/62CE7176211EB1B5626CADC6BC86E3E49C594E9D/1396486764000">http://memex.zapto.org/data/page/62CE7176211EB1B5626CADC6BC86E3E49C594E9D/1396486764000</a></li>
+
+
+<br/>RAW IMAGES<br/>
+<li>backpage image <a href="http://memex.zapto.org/data/image/E33C5BB9B2AFC027DDAF2A363DEE8AEC4E9B65EF/1405587221000/raw">http://memex.zapto.org/data/image/E33C5BB9B2AFC027DDAF2A363DEE8AEC4E9B65EF/1405587221000/raw</a></li>
+<li>craigslist image <a href="http://memex.zapto.org/data/image/C292D5CC63A0CD5DE2063FB799033E876A2B0F38/1402409219000/raw">http://memex.zapto.org/data/image/C292D5CC63A0CD5DE2063FB799033E876A2B0F38/1402409219000/raw</a></li>
+<li>myproviderguide image <a href="http://memex.zapto.org/data/image/B4198BF952248E9C0964B05A594D00F6DF8C5407/1402421016000/raw">http://memex.zapto.org/data/image/B4198BF952248E9C0964B05A594D00F6DF8C5407/1402421016000/raw</a></li>
+<li>naughtyreviews image <a href="http://memex.zapto.org/data/image/5B4DDC272725AE02C66A79A7B11FF61749737C63/1406367924000/raw">http://memex.zapto.org/data/image/5B4DDC272725AE02C66A79A7B11FF61749737C63/1406367924000/raw</a></li>
+
+<br/>PROCESSED IMAGES<br/>
+<li>backpage image <a href="http://memex.zapto.org/data/image/E33C5BB9B2AFC027DDAF2A363DEE8AEC4E9B65EF/1405587221000/processed">http://memex.zapto.org/data/image/E33C5BB9B2AFC027DDAF2A363DEE8AEC4E9B65EF/1405587221000/processed</a></li>
+<li>craigslist image <a href="http://memex.zapto.org/data/image/C292D5CC63A0CD5DE2063FB799033E876A2B0F38/1402409219000/processed">http://memex.zapto.org/data/image/C292D5CC63A0CD5DE2063FB799033E876A2B0F38/1402409219000/processed</a></li>
+<li>myproviderguide image <a href="http://memex.zapto.org/data/image/B4198BF952248E9C0964B05A594D00F6DF8C5407/1402421016000/processed">http://memex.zapto.org/data/image/B4198BF952248E9C0964B05A594D00F6DF8C5407/1402421016000/processed</a></li>
+<li>naughtyreviews image <a href="http://memex.zapto.org/data/image/5B4DDC272725AE02C66A79A7B11FF61749737C63/1406367924000/processed">http://memex.zapto.org/data/image/5B4DDC272725AE02C66A79A7B11FF61749737C63/1406367924000/processed</a></li>
+
+<br/>EXTRACTED IMAGES (handled by redirecting to /processed)<br/>
+<li>backpage image <a href="http://memex.zapto.org/data/image/E33C5BB9B2AFC027DDAF2A363DEE8AEC4E9B65EF/1405587221000/extracted">http://memex.zapto.org/data/image/E33C5BB9B2AFC027DDAF2A363DEE8AEC4E9B65EF/1405587221000/extracted</a></li>
+<li>craigslist image <a href="http://memex.zapto.org/data/image/C292D5CC63A0CD5DE2063FB799033E876A2B0F38/1402409219000/extracted">http://memex.zapto.org/data/image/C292D5CC63A0CD5DE2063FB799033E876A2B0F38/1402409219000/extracted</a></li>
+<li>myproviderguide image <a href="http://memex.zapto.org/data/image/B4198BF952248E9C0964B05A594D00F6DF8C5407/1402421016000/extracted">http://memex.zapto.org/data/image/B4198BF952248E9C0964B05A594D00F6DF8C5407/1402421016000/extracted</a></li>
+<li>naughtyreviews image <a href="http://memex.zapto.org/data/image/5B4DDC272725AE02C66A79A7B11FF61749737C63/1406367924000/extracted">http://memex.zapto.org/data/image/5B4DDC272725AE02C66A79A7B11FF61749737C63/1406367924000/extracted</a></li>
+
+<br/>IMAGES with no stage (handled by redirecting to /raw)<br/>
+<li>backpage image <a href="http://memex.zapto.org/data/image/E33C5BB9B2AFC027DDAF2A363DEE8AEC4E9B65EF/1405587221000">http://memex.zapto.org/data/image/E33C5BB9B2AFC027DDAF2A363DEE8AEC4E9B65EF/1405587221000</a></li>
+<li>craigslist image <a href="http://memex.zapto.org/data/image/C292D5CC63A0CD5DE2063FB799033E876A2B0F38/1402409219000">http://memex.zapto.org/data/image/C292D5CC63A0CD5DE2063FB799033E876A2B0F38/1402409219000</a></li>
+<li>myproviderguide image <a href="http://memex.zapto.org/data/image/B4198BF952248E9C0964B05A594D00F6DF8C5407/1402421016000">http://memex.zapto.org/data/image/B4198BF952248E9C0964B05A594D00F6DF8C5407/1402421016000</a></li>
+<li>naughtyreviews image <a href="http://memex.zapto.org/data/image/5B4DDC272725AE02C66A79A7B11FF61749737C63/1406367924000">http://memex.zapto.org/data/image/5B4DDC272725AE02C66A79A7B11FF61749737C63/1406367924000</a></li>
+
+<br/>IMAGE FEATURECOLLECTIONS<br/>
+<li>backpage image <a href="http://memex.zapto.org/data/image/E33C5BB9B2AFC027DDAF2A363DEE8AEC4E9B65EF/1405587221000/featurecollection">http://memex.zapto.org/data/image/E33C5BB9B2AFC027DDAF2A363DEE8AEC4E9B65EF/1405587221000/featurecollection</a></li>
+<li>craigslist image <a href="http://memex.zapto.org/data/image/C292D5CC63A0CD5DE2063FB799033E876A2B0F38/1402409219000/featurecollection">http://memex.zapto.org/data/image/C292D5CC63A0CD5DE2063FB799033E876A2B0F38/1402409219000/featurecollection</a></li>
+<li>myproviderguide image <a href="http://memex.zapto.org/data/image/B4198BF952248E9C0964B05A594D00F6DF8C5407/1402421016000/featurecollection">http://memex.zapto.org/data/image/B4198BF952248E9C0964B05A594D00F6DF8C5407/1402421016000/featurecollection</a></li>
+<li>naughtyreviews image <a href="http://memex.zapto.org/data/image/5B4DDC272725AE02C66A79A7B11FF61749737C63/1406367924000/featurecollection">http://memex.zapto.org/data/image/5B4DDC272725AE02C66A79A7B11FF61749737C63/1406367924000/featurecollection</a></li>
+
+
+</ul>
+</body>
+</html>

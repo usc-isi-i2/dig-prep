@@ -12,5 +12,6 @@ public class SearchFieldsES {
 	public static final String SOURCE = "source";
 	public static final String DOCUMENT_TYPE = "document_type";
 	public static final String PROCESS_STAGE = "process_stage";
+	public static final String URI = "uri";
 
 }

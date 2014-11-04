@@ -1,0 +1,90 @@
+# Options +FollowSymLinks
+# Enable Rewriting
+RewriteEngine on
+
+ErrorDocument 404 /cgi-bin/404.py
+ 
+# IMAGES
+
+# IMAGES: no stage: rewrite to /raw
+#   Input:  data/image/<sha1>/<epoch>
+#   Output: /cgi-bin/image.py?sha1=$1&epoch=$2
+RewriteRule ^data/image/([0-9A-F]{40})/([0-9]{13})$ data/image/$1/$2/raw
+#   Input:  data/image/<sha1>-<epoch>
+#   Output: /cgi-bin/image.py?sha1=$1&epoch=$2
+RewriteRule ^data/image/([0-9A-F]{40})-([0-9]{13})$ data/image/$1/$2/raw
+
+# RAW IMAGES: redirect using image.py CGI
+#   Input:  data/image/<sha1>/<epoch>/raw
+#   Output: data/image/<sha1>/<epoch>
+RewriteRule ^data/image/([0-9A-F]{40})/([0-9]{13})/raw$ /cgi-bin/image.py?sha1=$1&epoch=$2&stage=raw [R,L]
+#   Input:  data/image/<sha1>-<epoch>/raw
+#   Output: data/image/<sha1>/<epoch>
+RewriteRule ^data/image/([0-9A-F]{40})-([0-9]{13})/raw$ /cgi-bin/image.py?sha1=$1&epoch=$2&stage=raw [R,L]
+
+# EXTRACTED IMAGES: rewrite to /processed
+# deprecated?
+#   Input:  data/image/<sha1>/<epoch>/extracted
+#   Output: data/image/<sha1>/<epoch>/processed
+RewriteRule ^data/image/([0-9A-F]{40})/([0-9]{13})/extracted$ data/image/$1/$2/processed
+#   Input:  data/image/<sha1>-<epoch>/extracted
+#   Output: data/image/<sha1>/<epoch>
+RewriteRule ^data/image/([0-9A-F]{40})-([0-9]{13})/extracted$ data/image/$1/$2/processed
+
+# PROCESSED IMAGES: redirect using image.py CGI
+#   Input:  data/image/<sha1>/<epoch>/processed
+#   Output: data/image/<sha1>/<epoch>
+RewriteRule ^data/image/([0-9A-F]{40})/([0-9]{13})/processed$ /cgi-bin/image.py?sha1=$1&epoch=$2&stage=processed [R,L]
+#   Input:  data/image/<sha1>-<epoch>/processed
+#   Output: data/image/<sha1>/<epoch>
+RewriteRule ^data/image/([0-9A-F]{40})-([0-9]{13})/processed$ /cgi-bin/image.py?sha1=$1&epoch=$2&stage=processed [R,L]
+
+# IMAGE FEATURECOLLECTIONS: redirect using image.py CGI
+#   Input:  data/image/<sha1>/<epoch>/featurecollection
+#   Output: /cgi-bin/image.py?sha1=$1&epoch=$2&stage=featurecollection
+RewriteRule ^data/image/([0-9A-F]{40})/([0-9]{13})/featurecollection$ /cgi-bin/image.py?sha1=$1&epoch=$2&stage=featurecollection [R,L]
+#   Input:  data/image/<sha1>-<epoch>/featurecollection
+#   Output: /cgi-bin/image.py?sha1=$1&epoch=$2&stage=featurecollection
+RewriteRule ^data/image/([0-9A-F]{40})-([0-9]{13})/featurecollection$ /cgi-bin/image.py?sha1=$1&epoch=$2&stage=featurecollection [R,L]
+
+# PAGES
+# PAGES: no stage: rewrite to /raw
+#   Input:  data/page/<sha1>/<epoch>
+#   Output: /cgi-bin/page.py?sha1=$1&epoch=$2
+RewriteRule ^data/page/([0-9A-F]{40})/([0-9]{13})$ data/page/$1/$2/raw
+#   Input:  data/page/<sha1>-<epoch>
+#   Output: /cgi-bin/page.py?sha1=$1&epoch=$2
+RewriteRule ^data/page/([0-9A-F]{40})-([0-9]{13})$ data/page/$1/$2/raw
+
+# RAW PAGES: redirect using page.py CGI
+#   Input:  data/page/<sha1>/<epoch>/raw
+#   Output: /cgi-bin/page.py?sha1=$1&epoch=$2&stage=raw
+RewriteRule ^data/page/([0-9A-F]{40})/([0-9]{13})/raw$ /cgi-bin/page.py?sha1=$1&epoch=$2&stage=raw [R,L]
+#   Input:  data/page/<sha1>-<epoch>/raw
+#   Output: /cgi-bin/page.py?sha1=$1&epoch=$2&stage=raw
+RewriteRule ^data/page/([0-9A-F]{40})-([0-9]{13})/raw$ /cgi-bin/page.py?sha1=$1&epoch=$2&stage=raw [R,L]
+
+# EXTRACTED PAGES: rewrite to /processed
+#   Input:  data/page/<sha1>/<epoch>/extracted
+#   Output: data/page/<sha1>/<epoch>/processed
+RewriteRule ^data/page/([0-9A-F]{40})/([0-9]{13})/extracted$ data/page.py/$1/$2/processed
+#   Input:  data/page/<sha1>-<epoch>/extracted
+#   Output: data/page/<sha1>/<epoch>/processed
+RewriteRule ^data/page/([0-9A-F]{40})-([0-9]{13})/extracted$ data/page.py/$1/$2/processed
+
+# PROCESSED PAGES: redirect using page.py CGI
+#   Input:  data/page/<sha1>/<epoch>/processed
+#   Output: /cgi-bin/page.py?sha1=$1&epoch=$2&stage=processed
+RewriteRule ^data/page/([0-9A-F]{40})/([0-9]{13})/processed$ /cgi-bin/page.py?sha1=$1&epoch=$2&stage=processed [R,L]
+#   Input:  data/page/<sha1>-<epoch>/processed
+#   Output: /cgi-bin/page.py?sha1=$1&epoch=$2&stage=processed
+RewriteRule ^data/page/([0-9A-F]{40})-([0-9]{13})/processed$ /cgi-bin/page.py?sha1=$1&epoch=$2&stage=processed [R,L]
+
+# PAGE FEATURECOLLECTIONS: redirect using page.py CGI
+#   Input:  data/page/<sha1>/<epoch>/featurecollection
+#   Output: /cgi-bin/page.py?sha1=$1&epoch=$2&stage=featurecollection
+RewriteRule ^data/page/([0-9A-F]{40})/([0-9]{13})/featurecollection$ /cgi-bin/page.py?sha1=$1&epoch=$2&stage=featurecollection [R,L]
+#   Input:  data/page/<sha1>-<epoch>/featurecollection
+#   Output: /cgi-bin/page.py?sha1=$1&epoch=$2&stage=featurecollection
+RewriteRule ^data/page/([0-9A-F]{40})-([0-9]{13})/featurecollection$ /cgi-bin/page.py?sha1=$1&epoch=$2&stage=featurecollection [R,L]
+
