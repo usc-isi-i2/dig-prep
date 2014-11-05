@@ -63,8 +63,9 @@ class InternalServerErrorHttpStatus(HttpStatus):
 
     def explain(self):
         print "Server failed (e) on resource %s" % os.environ["REQUEST_URI"]
-        if self.exception:
-            print "Internal error was (%r)" % (self.exception)
+        # This is nice for debugging, but leaks the ES server identity
+        # if self.exception:
+        #     print "Internal error was (%r)" % (self.exception)
 
 class NotImplementedHttpStatus(HttpStatus):
     code = 501
