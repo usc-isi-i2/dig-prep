@@ -25,18 +25,19 @@ from exc import HttpStatus, SeeOtherHttpStatus, NotFoundHttpStatus, InternalServ
 #              "epoch":1412717393}]}
 
 # Drop None and "extracted" here: must be referred from redirect service which interprets those
-LEGAL_STAGES = ["raw", "processed", "featurecollection"]
+LEGAL_STAGES = ["raw", "processed"]
 LEGAL_SCOPES = ["page", "image"]
+LEGAL_PARTS = ["featurecollection"]
 
 PAYLOADS = { 
     # maps (<scope>, <stage>) into a function to drill down to the value to return from ES result
     ("page", "raw"): lambda(j): j.get("cache_url"),
     ("page", "processed"): lambda(j): j,
-    ("page", "featurecollection"): lambda(j): j,
+    ("page", "processed/featurecollection"): lambda(j): j.get("hasFeatureCollection"),
 
     ("image", "raw"): lambda(j): j.get("cache_url"),
     ("image", "processed"): lambda(j): j,
-    ("image", "featurecollection"): lambda(j): j,
+    ("image", "processed/featurecollection"): lambda(j): j.get("hasFeatureCollection"),
     }
 
 MIME_TYPES = {
@@ -44,20 +45,21 @@ MIME_TYPES = {
     # None means we don't do the MIME stuff, we redirect and count on the end destination server to handle
     ("page", "raw"): lambda(j): None,
     ("page", "processed"): lambda(j): "application/json",
-    ("page", "featurecollection"): "application/json",
+    ("page", "processed/featurecollection"): lambda(j): "application/json",
 
     ("image", "raw"): lambda(j): None,
     ("image", "processed"): lambda(j): "application/json",
-    ("image", "featurecollection"): "application/json",
+    ("image", "processed/featurecollection"): lambda(j): "application/json",
     }
 
-VERBOSE = True
+VERBOSE = False
 
 def fetch(sha1, epoch,
           host = "karma-dig-service.cloudapp.net",
           port = 55333,
           scope = "image",
           stage = "raw",
+          part = None,
           mapping = {"image": "images",
                      "page": "pages"},
           verbose = VERBOSE):
@@ -71,10 +73,13 @@ def fetch(sha1, epoch,
             raise NotFoundHttpStatus()
         if not stage in LEGAL_STAGES:
             # Unrecognized stage => 404
-            raise NotFoundHttpStatus()            
-        payload = PAYLOADS[(scope, stage)]
-        mime_type = MIME_TYPES[(scope, stage)]
-
+            raise NotFoundHttpStatus()
+        # subkey is <stage> or <stage>/<part>
+        subkey = stage
+        if part:
+            subkey = "%s/%s" % (stage, part)
+        payload = PAYLOADS[(scope, subkey)]
+        mime_type = MIME_TYPES[(scope, subkey)]
         url = template % (host, port, mapping[scope], sha1, epoch, stage)
         if verbose:
             print >> sys.stderr, "templated url %r" % url
@@ -103,6 +108,10 @@ def fetch(sha1, epoch,
         if verbose:
             print >> sys.stderr, "raw results %r" % (results or single)
         if single:
+            if verbose:
+                print >> sys.stderr, "single: return directly"
+                print >> sys.stderr, "payload %r" % payload(single)
+                print >> sys.stderr, "mime_type %r" % mime_type(single)
             return (payload(single), mime_type(single))
         if results:
             if isinstance(results, list):
@@ -156,7 +165,7 @@ def debugRespond(sha1=None, epoch=None, scope=None, stage=None, location=None, m
     </body>
     </html>""" % (scope, sha1, epoch, scope, stage, location, mimeType, err, os.environ)
 
-def handleRedirect(scope="page", stage="raw", debug=False, verbose=VERBOSE):
+def handleRedirect(scope="page", stage="raw", part=None, debug=False, verbose=VERBOSE):
     sha1 = None
     epoch = None
     location = None
@@ -165,12 +174,13 @@ def handleRedirect(scope="page", stage="raw", debug=False, verbose=VERBOSE):
         sha1 = form.getvalue("sha1", "missing").upper()
         epoch = form.getvalue("epoch", "missing")
         stage = form.getvalue("stage", stage).lower()
-        (value, contentType) = fetch(sha1, epoch, scope=scope, stage=stage)
+        part = form.getvalue("part", part)
+        (value, contentType) = fetch(sha1, epoch, scope=scope, stage=stage, part=part)
         # We got an answer, so we present that data
         # Should this be OKHttpStatus?
         if verbose:
-            print >> sys.stderr, "value %s" % value
-            print >> sys.stderr, "contentType %s" % contentType
+            print >> sys.stderr, "fetch value %s" % value
+            print >> sys.stderr, "fetch contentType %s" % contentType
         print "Content-type: %s" % (contentType)
         print
         # needs to be more sophisticated?
