@@ -25,39 +25,41 @@ from exc import HttpStatus, SeeOtherHttpStatus, NotFoundHttpStatus, InternalServ
 #              "epoch":1412717393}]}
 
 # Drop None and "extracted" here: must be referred from redirect service which interprets those
-LEGAL_STAGES = ["raw", "processed", "featurecollection"]
+LEGAL_STAGES = ["raw", "processed"]
 LEGAL_SCOPES = ["page", "image"]
+LEGAL_PARTS = ["featurecollection"]
 
 PAYLOADS = { 
     # maps (<scope>, <stage>) into a function to drill down to the value to return from ES result
     ("page", "raw"): lambda(j): j.get("cache_url"),
     ("page", "processed"): lambda(j): j,
-    ("page", "featurecollection"): lambda(j): j,
+    ("page", "processed/featurecollection"): lambda(j): j.get("hasFeatureCollection"),
 
     ("image", "raw"): lambda(j): j.get("cache_url"),
     ("image", "processed"): lambda(j): j,
-    ("image", "featurecollection"): lambda(j): j,
+    ("image", "processed/featurecollection"): lambda(j): j.get("hasFeatureCollection"),
     }
 
 MIME_TYPES = {
     # maps (<scope>, <stage>) into a function generate the type to return from ES result
     # None means we don't do the MIME stuff, we redirect and count on the end destination server to handle
-    ("page", "raw"): None,
+    ("page", "raw"): lambda(j): None,
     ("page", "processed"): lambda(j): "application/json",
-    ("page", "featurecollection"): "application/json",
+    ("page", "processed/featurecollection"): lambda(j): "application/json",
 
-    ("image", "raw"): None,
+    ("image", "raw"): lambda(j): None,
     ("image", "processed"): lambda(j): "application/json",
-    ("image", "featurecollection"): "application/json",
+    ("image", "processed/featurecollection"): lambda(j): "application/json",
     }
 
-VERBOSE = True
+VERBOSE = False
 
 def fetch(sha1, epoch,
           host = "karma-dig-service.cloudapp.net",
           port = 55333,
           scope = "image",
           stage = "raw",
+          part = None,
           mapping = {"image": "images",
                      "page": "pages"},
           verbose = VERBOSE):
@@ -71,13 +73,16 @@ def fetch(sha1, epoch,
             raise NotFoundHttpStatus()
         if not stage in LEGAL_STAGES:
             # Unrecognized stage => 404
-            raise NotFoundHttpStatus()            
-        payload = PAYLOADS[(scope, stage)]
-        mime_type = MIME_TYPES[(scope, stage)]
-
+            raise NotFoundHttpStatus()
+        # subkey is <stage> or <stage>/<part>
+        subkey = stage
+        if part:
+            subkey = "%s/%s" % (stage, part)
+        payload = PAYLOADS[(scope, subkey)]
+        mime_type = MIME_TYPES[(scope, subkey)]
         url = template % (host, port, mapping[scope], sha1, epoch, stage)
         if verbose:
-            print >> sys.stderr, "url %r" % url
+            print >> sys.stderr, "templated url %r" % url
         response = requests.get(url)
         if verbose:
             print >> sys.stderr, "scope %r" % (scope)
@@ -87,16 +92,27 @@ def fetch(sha1, epoch,
             print >> sys.stderr, "response %r" % response
             print >> sys.stderr, "response text %r" % response.text
             print >> sys.stderr, "response status %r" % response.status_code
+            # this is the response content type
+            print >> sys.stderr, "response content type %r" % response.headers['content-type']
         if response.status_code != 200:
             # If ES didn't recognize, treat as 404
             raise NotFoundHttpStatus()
         dct = json.loads(response.text)
         if verbose:
-            print >> sys.stderr, "dct %r" % dct
+            print >> sys.stderr, json.dumps(dct, sort_keys=True, indent=4)
+        # dct might be a set of one or more results, represented as {"results": [r1, r2]}
+        # or it might be a single result {"a:" ...}
         results = dct and dct.get("results")
+        single = dct and dct.get("a") and dct
         # results should be a list of json objects
         if verbose:
-            print >> sys.stderr, "results %r" % results
+            print >> sys.stderr, "raw results %r" % (results or single)
+        if single:
+            if verbose:
+                print >> sys.stderr, "single: return directly"
+                print >> sys.stderr, "payload %r" % payload(single)
+                print >> sys.stderr, "mime_type %r" % mime_type(single)
+            return (payload(single), mime_type(single))
         if results:
             if isinstance(results, list):
                 if len(results) == 1:
@@ -149,7 +165,7 @@ def debugRespond(sha1=None, epoch=None, scope=None, stage=None, location=None, m
     </body>
     </html>""" % (scope, sha1, epoch, scope, stage, location, mimeType, err, os.environ)
 
-def handleRedirect(scope="page", stage="raw", debug=False, verbose=VERBOSE):
+def handleRedirect(scope="page", stage="raw", part=None, debug=False, verbose=VERBOSE):
     sha1 = None
     epoch = None
     location = None
@@ -158,16 +174,17 @@ def handleRedirect(scope="page", stage="raw", debug=False, verbose=VERBOSE):
         sha1 = form.getvalue("sha1", "missing").upper()
         epoch = form.getvalue("epoch", "missing")
         stage = form.getvalue("stage", stage).lower()
-        (value, contentType) = fetch(sha1, epoch, scope=scope, stage=stage)
+        part = form.getvalue("part", part)
+        (value, contentType) = fetch(sha1, epoch, scope=scope, stage=stage, part=part)
         # We got an answer, so we present that data
         # Should this be OKHttpStatus?
         if verbose:
-            print >> sys.stderr, "value %s" % value
-            print >> sys.stderr, "contentType %s" % contentType
+            print >> sys.stderr, "fetch value %s" % value
+            print >> sys.stderr, "fetch contentType %s" % contentType
         print "Content-type: %s" % (contentType)
         print
-        # needs to be more sophisticated
-        print "%s" % value
+        # needs to be more sophisticated?
+        print "%s" % json.dumps(value)
     except HttpStatus as status:
         # even redirects handled here now
         if debug:

@@ -2,6 +2,21 @@
 # Enable Rewriting
 RewriteEngine on
 
+AuthType Basic
+AuthName "memex_user password: contact philpot@isi.edu for assistance"
+# (Following line optional)
+AuthBasicProvider file
+AuthUserFile /var/www/htpasswd
+Require user memex_user
+
+# <IfModule mod_headers.c>
+#   Header set Animal cow
+#   Header set Animal monkey
+#   Header append Animal camel
+# </IfModule>
+
+Header echo ^.*
+
 ErrorDocument 404 /cgi-bin/404.py
  
 # IMAGES
@@ -39,13 +54,13 @@ RewriteRule ^data/image/([0-9A-F]{40})/([0-9]{13})/processed$ /cgi-bin/image.py?
 #   Output: data/image/<sha1>/<epoch>
 RewriteRule ^data/image/([0-9A-F]{40})-([0-9]{13})/processed$ /cgi-bin/image.py?sha1=$1&epoch=$2&stage=processed [R,L]
 
-# IMAGE FEATURECOLLECTIONS: redirect using image.py CGI
-#   Input:  data/image/<sha1>/<epoch>/featurecollection
-#   Output: /cgi-bin/image.py?sha1=$1&epoch=$2&stage=featurecollection
-RewriteRule ^data/image/([0-9A-F]{40})/([0-9]{13})/featurecollection$ /cgi-bin/image.py?sha1=$1&epoch=$2&stage=featurecollection [R,L]
-#   Input:  data/image/<sha1>-<epoch>/featurecollection
-#   Output: /cgi-bin/image.py?sha1=$1&epoch=$2&stage=featurecollection
-RewriteRule ^data/image/([0-9A-F]{40})-([0-9]{13})/featurecollection$ /cgi-bin/image.py?sha1=$1&epoch=$2&stage=featurecollection [R,L]
+# PROCESSED IMAGE FEATURECOLLECTIONS: redirect using image.py CGI
+#   Input:  data/image/<sha1>/<epoch>/processed/featurecollection
+#   Output: /cgi-bin/image.py?sha1=$1&epoch=$2&stage=processed&part=featurecollection
+RewriteRule ^data/image/([0-9A-F]{40})/([0-9]{13})/processed/featurecollection$ /cgi-bin/image.py?sha1=$1&epoch=$2&stage=processed&part=featurecollection [R,L]
+#   Input:  data/image/<sha1>-<epoch>/processed/featurecollection
+#   Output: /cgi-bin/image.py?sha1=$1&epoch=$2&stage=processed&part=featurecollection
+RewriteRule ^data/image/([0-9A-F]{40})-([0-9]{13})/processed/featurecollection$ /cgi-bin/image.py?sha1=$1&epoch=$2&stage=processed&part=featurecollection [R,L]
 
 # PAGES
 # PAGES: no stage: rewrite to /raw
@@ -80,11 +95,11 @@ RewriteRule ^data/page/([0-9A-F]{40})/([0-9]{13})/processed$ /cgi-bin/page.py?sh
 #   Output: /cgi-bin/page.py?sha1=$1&epoch=$2&stage=processed
 RewriteRule ^data/page/([0-9A-F]{40})-([0-9]{13})/processed$ /cgi-bin/page.py?sha1=$1&epoch=$2&stage=processed [R,L]
 
-# PAGE FEATURECOLLECTIONS: redirect using page.py CGI
-#   Input:  data/page/<sha1>/<epoch>/featurecollection
-#   Output: /cgi-bin/page.py?sha1=$1&epoch=$2&stage=featurecollection
-RewriteRule ^data/page/([0-9A-F]{40})/([0-9]{13})/featurecollection$ /cgi-bin/page.py?sha1=$1&epoch=$2&stage=featurecollection [R,L]
-#   Input:  data/page/<sha1>-<epoch>/featurecollection
-#   Output: /cgi-bin/page.py?sha1=$1&epoch=$2&stage=featurecollection
-RewriteRule ^data/page/([0-9A-F]{40})-([0-9]{13})/featurecollection$ /cgi-bin/page.py?sha1=$1&epoch=$2&stage=featurecollection [R,L]
+# PROCESSED PAGE FEATURECOLLECTIONS: redirect using page.py CGI
+#   Input:  data/page/<sha1>/<epoch>/processed/featurecollection
+#   Output: /cgi-bin/page.py?sha1=$1&epoch=$2&stage=processed&part=featurecollection
+RewriteRule ^data/page/([0-9A-F]{40})/([0-9]{13})/processed/featurecollection$ /cgi-bin/page.py?sha1=$1&epoch=$2&stage=processed&part=featurecollection [R,L]
+#   Input:  data/page/<sha1>-<epoch>/processed/featurecollection
+#   Output: /cgi-bin/page.py?sha1=$1&epoch=$2&stage=processed&part=featurecollection
+RewriteRule ^data/page/([0-9A-F]{40})-([0-9]{13})/processed/featurecollection$ /cgi-bin/page.py?sha1=$1&epoch=$2&stage=processed&part=featurecollection [R,L]
 
