@@ -1,7 +1,22 @@
-import simplejson as json
+"""
+dig.jpath
+"""
+__author__ = 'philpot'
+
 import sys
+import simplejson as json
 import argparse
 from jsonpath_rw import parse
+
+# 18 November 2014
+# intended as front end to inline_deobfuscator.py
+# given input on stdin of the form
+# URL\tJSON
+# and a path argument on the command line
+# return output of the form
+# URL\tPAYLOAD
+# where the URL is the same as input URL
+# where the PAYLOAD is the (first) jsonpath application of the path argument to the input JSON
 
 def main(argv=None):
     '''this is called if run from command line'''
@@ -12,13 +27,11 @@ def main(argv=None):
                             type=str, 
                             help='see python module jsonpath_rw')
         args = parser.parse_args()
-        print >> sys.stderr, args
         path = args.path
         expr = parse(path)
         for line in sys.stdin:
             try:
                 (url, repn) = line.split('\t')
-                print >> sys.stderr, "repn %r" % repn
                 obj = json.loads(repn)
                 vals = expr.find(obj)
                 val = vals[0].value
