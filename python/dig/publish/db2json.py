@@ -25,7 +25,8 @@ def db2json(outstream=sys.stdout,
             query=QUERY,
             limit=LIMIT,
             maxAttempts=MAXATTEMPTS,
-            tab=False):
+            tab=False,
+            verbose=False):
 
     def emit(item, stream):
         """JSON-encode all data except URLs"""
@@ -46,11 +47,16 @@ def db2json(outstream=sys.stdout,
                                   database=database)
     cursor = cnx.cursor()
     if limit:
-        query = query + " LIMIT %s" % limit
-    cursor.execute(query)
+        query = query.rstrip() + " LIMIT %s" % limit
+    if verbose:
+        print >> sys.stderr, "Query: %r" % query
+    # I don't see why we would need multi in this case
+    cursor.execute(query, multi=False)
 
     tally = 0
     for (values) in cursor:
+        if verbose:
+            print "here is a row"
         if not tab:
             outstream.write("[")
         remaining = len(values)
@@ -73,6 +79,9 @@ def main(argv=None):
     (prog, args) = interpretCmdLine()
     parser = argparse.ArgumentParser(prog, description='db2json')
     # parser.add_argument("-o")
+    parser.add_argument('-l','--limit', 
+                        help='num rows to fetch', 
+                        default=LIMIT)
     parser.add_argument('-o','--output', 
                         help='output file', 
                         default=None)
@@ -83,20 +92,26 @@ def main(argv=None):
                         help='drop outer brackets, use tab separators', 
                         required=False, 
                         action='store_true')
+    parser.add_argument('-v','--verbose', 
+                        help='verbose output',
+                        required=False, 
+                        action='store_true')
+
     args = parser.parse_args(args)
     try:
         if os.path.exists(args.query):
             args.query = open(args.query, 'r').read()
     except Exception as e:
         print >> sys.stderr, "Failed to open %s [%r], using as as query" % (args.query, e)
-    print >> sys.stderr, "output %s" % args.output
-    print >> sys.stderr, "query %s" % args.query
-    print >> sys.stderr, "tab %s" % args.tab
+    if args.verbose:
+        print >> sys.stderr, "output %s" % args.output
+        print >> sys.stderr, "query %s" % args.query
+        print >> sys.stderr, "tab %s" % args.tab
     if args.output:
         with open(args.output, "w") as f:
-            db2json(outstream=f, query=args.query, tab=args.tab, limit=5000)
+            db2json(outstream=f, query=args.query, tab=args.tab, limit=args.limit, verbose=args.verbose)
     else:
-        db2json(sys.stdout, query=args.query, tab=args.tab, limit=5000)
+        db2json(sys.stdout, query=args.query, tab=args.tab, limit=args.limit, verbose=args.verbose)
 
 # call main() if this is run as standalone
 if __name__ == "__main__":
