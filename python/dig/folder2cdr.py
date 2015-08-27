@@ -2,6 +2,7 @@
 
 import sys, os, codecs, glob
 import os.path, time, calendar
+import json
 
 infolder = os.path.realpath(sys.argv[1])
 # inpath = os.path.realpath(sys.argv[1])
@@ -43,9 +44,14 @@ def infolderToOutpath(path):
 if __name__ == '__main__':
     outpath = infolderToOutpath(infolder)
     with codecs.open(outpath, 'w', encoding='utf-8') as fo:
-        for inpath in glob.glob(os.path.join(infolder, "[0-9a-z]*")):
+        limit = 25000
+        for inpath in glob.glob(os.path.join(infolder, "[0-9a-zA-Z]*")):
             url = inpathToUrl(inpath)
             body = inpathToBody(inpath)
-            print >> fo, url
+            print >> fo, url,
             print >> fo, "\t",
-            print >> fo, body
+            print >> fo, json.dumps(body)
+            limit += -1
+            if limit <= 0:
+                break
+
