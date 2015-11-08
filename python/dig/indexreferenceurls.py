@@ -4,19 +4,20 @@ dig.indexreferenceurls
 __author__ = 'saggu'
 
 import json
+import codecs
 from elasticsearch import Elasticsearch
 from sys import stderr
 import sys
 import re
 
-es = Elasticsearch([{'host': 'karma-dig-service.cloudapp.net', 'port': 55310}])
+es = Elasticsearch([{'host': '10.202.20.250', 'port': 9200}])
 
 #fileName = "build.json"
 
 
 def readJsonfromFile(filename, index, doctype):
     try:
-        with open(filename) as f:
+        with codecs.open(filename,encoding='utf-8') as f:
             d = json.load(f)
             for fc in d:
                 sha1 = re.findall('([A-F0-9]{40})',fc["uri"]) #find all sha from the uri
@@ -35,11 +36,13 @@ def indexURL(filename, index, doctype):
         for line in lines:
             if line.strip() != "":
                 jsonurlobj = json.loads(line.strip())
-                objkey = jsonurlobj.keys()[0]
-                body = jsonurlobj[objkey]
+                objkey = jsonurlobj['uri']
+                #body = jsonurlobj[objkey]
                 #print body
-                print "indexing id: " + objkey + "\n"
-                es.index(index=index,doc_type=doctype,id=objkey,body=body)
+                #print "indexing id: " + line
+                #u = unicode(line, "utf-8")
+		print "indexing id: " + objkey
+                es.index(index=index,doc_type=doctype,body=line)
     except Exception, e:
         print >> stderr.write('ERROR: %s\n' % str(e))
 
