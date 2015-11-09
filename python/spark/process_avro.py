@@ -38,7 +38,7 @@ input_lines=100000
 counter=0
 inputset={}
 TABSS = '<TAB>'
-for line in lines:
+for line in reader:
         if counter > input_lines:
                 processlines(inputset)
                 inputset={}
